@@ -1,0 +1,159 @@
+from typing import Dict, List, Optional, Union
+
+from pydantic import BaseModel, Field
+
+from .base import ValueType
+from .enum import FeedbackVote
+
+FEEDBACK_M2M_IDENTIFIER = "M2M"
+
+
+class __Clue(BaseModel):
+    """
+    Define shared information between all clue formats.
+
+    role (str, None): the role of the Artefact that contains the source.
+      If 'None', the document is the `Target` that contains
+      the prediction or feedback where the Clue is saved.
+    """
+
+    role: Optional[str]
+
+
+class PageClue(__Clue):
+    """
+    Point to a page in a document.
+
+    page_idx: the page index of a page in an original document.
+      if a document is a split version of an original one,
+        page_idx is the page index of the page in the original document.
+    """
+
+    page_idx: int
+
+
+class ProjectionClue(__Clue):
+    """
+    Contains information to extract a `ProjectionField` from a Document.
+
+    Args:
+        pkey (str): key pointing to a list of `ProjectionRoot`
+        xid (str): the xid of the ProjectionRoot
+        projection_entry (str): see `__ProjectionBase.projection_entry`
+        # TODO rename this to `projection_path`
+
+    Examples:
+        (without recursive structure) document.projection[pkey]
+            -> filter projection_root_list by `xid`
+            -> output projection_root.result[projection_entry]
+        (with recursive structure) # TODO add example
+    """
+
+    pkey: str
+    xid: str
+    projection_entry: str
+
+
+ClueType = Union[PageClue, ProjectionClue]
+
+
+class Label(BaseModel):
+    """
+    Information produced about a `Target` and its connected `Artefact` documents,
+
+    value: Information on the label
+    clues: List of ClueType objects to explain `value`
+    """
+
+    value: Optional[ValueType]
+    clues: List[ClueType] = []
+
+    class Config:
+        smart_union = True
+
+
+class LabelFeedback(Label):
+    """
+    Remarks:
+        when field holds multiple values (see `Automatisme.prediction_schema`),
+            a value 'Z' can be invalidated by sharing a `LabelFeedback`
+            with `LabelFeedback.vote` == FeedbackVote.VALID and `LabelFeedback.value`
+            is 'Z'
+        when a field holds a single value, it can be invalidated by simply sharing a new
+            value or by invalidating it
+        when a value is invalidated, it does not appear in `Target.current`
+
+    identifier: identifies the source of a `Feedback`.
+    vote: defines if `Label.value` should be considered True or False
+    """
+
+    identifier: Optional[str] = FEEDBACK_M2M_IDENTIFIER
+    vote: FeedbackVote = FeedbackVote.VALID
+
+
+class ChildConnection(BaseModel):
+    atms_slug: str
+    doc_slug: str
+
+
+class LabelPrediction(Label):
+    """
+    Minimal data structure used in `Prediction`, containing a single prediction.
+
+    `Prediction.result[key]` is either a `LabelPrediction` or a list of `LabelPrediction`.
+
+    Args:
+        score (float, None): score of the prediction between 0 and 100
+        model_version (str, None): version of the model used for the prediction
+        children (Optional[str]): points to documents resulting of a split of the
+            original document.
+    """
+
+    score: Optional[float] = Field(None, ge=0, le=100)
+    model_version: Optional[str] = None
+    children: Optional[List[ChildConnection]] = None
+
+
+class Current(BaseModel):
+    """
+    Define the current value of a target's list of labels, based on Prediction and Feedback
+    """
+
+    result: Dict[str, Union[List[Label], Label]] = {}
+
+
+class Prediction(BaseModel):
+    """
+    Output typing related to AI-models predictions.
+
+    Args:
+        model_version (str, None): version of the model
+        score (float, None): overall prediction score (from 0 to 100)
+        comment (str): comment related to prediction
+        result (Dict[str, Union[List[LabelPrediction], LabelPrediction]]): see
+            `LabelPrediction`.
+
+    Remarks:
+        - the keys in result must match the `PredictionSchema` in the Automatisme
+            config, see `request.document.prediction_post_prediction`
+        - if the key in result does not match the keys in `PredictionSchema` no
+            error is raised
+    """
+
+    model_version: Optional[str] = None
+    score: Optional[float] = Field(None, ge=0, le=100)
+    comment: str = ""
+    result: Dict[str, Union[List[LabelPrediction], LabelPrediction]] = {}
+
+
+class Feedback(BaseModel):
+    """
+    Contain aggregated confirmations, deletions or modifications for a `Prediction` values.
+    """
+
+    identifier: Optional[str] = ""
+    date: Optional[float] = None
+    comment: str = ""
+    result: Dict[
+        str, Union[List[LabelFeedback], LabelFeedback]
+    ] = {}  # may be a list for type multi-classe
