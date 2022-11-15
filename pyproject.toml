@@ -1,0 +1,17 @@
+[tool.black]
+fast = true
+line-length = 88
+target-version = ['py38']
+include = '\.py$'
+exclude = '''
+/(
+  \.git
+  | data
+  | venv
+)/
+
+'''
+
+[tool.isort]
+profile = "black"
+extend_skip_glob = ["data/*", "venv/*"]

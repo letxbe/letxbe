@@ -1,0 +1,11 @@
+flake8
+mypy
+pytest
+black
+isort
+flake8-black
+flake8-isort
+pydantic
+pytest
+types-requests
+requests
