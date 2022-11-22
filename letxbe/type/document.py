@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
-from .base import SlugMixin, ValueType
+from .base import CreatedMixin, SlugMixin, ValueType
 from .enum import ActionCode, ClientEnv, DocumentStatus
 
 FormValueType = Union[List[ValueType], ValueType]
@@ -89,7 +89,7 @@ class StatusMixin(BaseModel):
     exception: Optional[str] = None
 
 
-class DocumentMixin(SlugMixin, MetadataMixin):
+class DocumentMixin(CreatedMixin, SlugMixin, MetadataMixin):
     """
     Information generated about a `Document`.
     """

@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError, parse_obj_as
 
-from letxbe.type.base import DatedMixin, ValueType, assert_type_and_value_equality
+from letxbe.type.base import CreatedMixin, ValueType, assert_type_and_value_equality
 
 
 @pytest.mark.parametrize("value", [True, False])
@@ -60,7 +60,6 @@ def test_assert_type_and_value_equality__raise(label_1, label_2):
 
 def test_read_created_at_and_updated_at():
     # When
-    dated_1 = DatedMixin(created_at=1)
+    dated_1 = CreatedMixin(created_at=1)
 
     assert dated_1.created_at == 1
-    assert dated_1.updated_at != dated_1.created_at

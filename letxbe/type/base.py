@@ -51,20 +51,11 @@ class SlugMixin(BaseModel):
         return value
 
 
-class DatedMixin(BaseModel):
+class CreatedMixin(BaseModel):
     """
-    A resource that can be created and updated.
+    A resource that can be created.
 
     created_at: timestamp in milliseconds corresponding to the creation of the object.
-    updated_at: timestamp in milliseconds corresponding to the moment the last edit was
-        made on the object.
     """
 
     created_at: int = 0
-    updated_at: int = 0
-
-
-class Vertex(SlugMixin, DatedMixin):
-    """
-    A resource stored in database.
-    """

@@ -58,7 +58,6 @@ other_artefact_slug = "other-artefact-slug"
 metadata = Metadata(
     client_env=client_env,
     name="Name to give the document for users to identify it easily.",
-    extension="csv",
     form={},
     artefact={
         other_role: {"slug": other_artefact_slug}
@@ -85,7 +84,6 @@ artefact_slug = "artefact-slug"
 metadata = Metadata(
     client_env=client_env,
     name="Name to give the document for users to identify it easily.",
-    extension="pdf",
     form={},
     artefact={
         artefact_role: {"slug": artefact_slug}
