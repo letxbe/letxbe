@@ -1,5 +1,4 @@
 import json
-import os
 from typing import Dict, Optional, Union, cast
 
 import requests
@@ -8,7 +7,7 @@ from .exception import AuthorizationError
 from .type import Artefact, Feedback, FeedbackResponse, Metadata, Target
 from .type.enum import Url
 
-BASE_URL = os.environ.get("SERVER_ADDRESS", "https://letxbe.ai")
+BASE_URL = "https://prod-unfold.onogone.com"
 
 
 class LXB:
@@ -16,11 +15,13 @@ class LXB:
     Connect to LetXbe and share requests.
     """
 
-    def __init__(self, client_id: str, client_secret: str):
+    def __init__(
+        self, client_id: str, client_secret: str, server_address: Optional[str] = None
+    ):
+        self.__server_address = BASE_URL if server_address is None else server_address
         self.__token = self._connect(client_id, client_secret)
 
-    @staticmethod
-    def _connect(client_id: str, client_secret: str) -> str:
+    def _connect(self, client_id: str, client_secret: str) -> str:
         """
         Connect with LetXbe.
 
@@ -31,7 +32,7 @@ class LXB:
             AuthorizationError: Invalid credentials.
         """
         response = requests.post(
-            BASE_URL + Url.LOGIN,
+            self.__server_address + Url.LOGIN,
             json={
                 "client_id": client_id,
                 "client_secret": client_secret,
@@ -98,7 +99,7 @@ class LXB:
             `slug` of the new document.
         """
         return self._post_document(
-            route=BASE_URL
+            route=self.__server_address
             + Url.POST_DOCUMENT.format(automatisme_slug=automatisme_slug),
             metadata=metadata,
             file=file,
@@ -124,7 +125,7 @@ class LXB:
             `slug` of the new document.
         """
         return self._post_document(
-            route=BASE_URL
+            route=self.__server_address
             + Url.POST_ARTEFACT.format(automatisme_slug=automatisme_slug, role=role),
             metadata=metadata,
             file=file,
@@ -148,7 +149,7 @@ class LXB:
             FeedbackResponse object containing a list of updated labels.
         """
         response = requests.post(
-            url=BASE_URL
+            url=self.__server_address
             + Url.POST_FEEDBACK.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
@@ -164,7 +165,7 @@ class LXB:
     ) -> Union[Artefact, Target]:
 
         response = requests.get(
-            url=BASE_URL
+            url=self.__server_address
             + Url.GET_DOCUMENT.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
