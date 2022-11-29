@@ -105,8 +105,7 @@ def test_lxb___post_document(mock_post, mock_lxb, file):
     )
 
     # When
-    response = mock_lxb._post_document(route, metadata, file)
+    mock_lxb._post_document(route, metadata, file)
 
     # Then
     mock_post.assert_called_once()
-    assert response == ""

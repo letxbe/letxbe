@@ -3,7 +3,7 @@ from typing import Dict, Optional, Union, cast
 
 import requests
 
-from .exception import AuthorizationError
+from .exception import AuthorizationError, AutomationError, UnkownRessourceError
 from .type import Artefact, Feedback, FeedbackResponse, Metadata, Target
 from .type.enum import Url
 
@@ -44,6 +44,16 @@ class LXB:
 
         return cast(str, response.json()["access_token"])
 
+    def _verify_status_code(self, res: requests.Response) -> None:
+        if res.status_code == 403:
+            raise AuthorizationError(res.reason)
+
+        if res.status_code == 404:
+            raise UnkownRessourceError(res.reason)
+
+        if res.status_code == 500:
+            raise AutomationError(res.reason)
+
     @property
     def authorization_header(self) -> Dict:
         return {"Authorization": "Bearer " + self.__token}
@@ -79,7 +89,9 @@ class LXB:
             headers=self.authorization_header,
         )
 
-        return response.text
+        self._verify_status_code(response)
+
+        return response.json()  # type: ignore [no-any-return]
 
     def post_target(
         self,
@@ -156,6 +168,9 @@ class LXB:
             data=feedback.dict(),
             headers=self.authorization_header,
         )
+
+        self._verify_status_code(response)
+
         return FeedbackResponse.parse_obj(response.json())
 
     def get_document(
@@ -171,6 +186,8 @@ class LXB:
             ),
             headers=self.authorization_header,
         )
+
+        self._verify_status_code(response)
 
         document_metadata = response.json()
         if "role" in document_metadata and document_metadata["role"] is not None:
