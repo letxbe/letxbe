@@ -73,7 +73,7 @@ class Label(BaseModel):
         clues: List of ClueType objects to explain `value`
     """
 
-    lid: str = Field(default_factory=uuid.uuid4)
+    lid: str = Field(default_factory=str(uuid.uuid4))
     value: Optional[ValueType]
     clues: List[ClueType] = []
 
