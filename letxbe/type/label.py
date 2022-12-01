@@ -1,3 +1,4 @@
+import uuid
 from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
@@ -66,10 +67,12 @@ class Label(BaseModel):
     Information produced about a `Target` and its connected `Artefact` documents,
 
     Args:
-        value: Information on the label
+        value: Information on the label.
+          There can be only one Label with the same `value` in a `multiple prediction field`
         clues: List of ClueType objects to explain `value`
     """
 
+    xid: uuid.UUID = Field(default_factory=uuid.uuid4)
     value: Optional[ValueType]
     clues: List[ClueType] = []
 
@@ -80,7 +83,7 @@ class Label(BaseModel):
 class LabelFeedback(Label):
     """
     Args:
-        identifier: identifies the source of a `Feedback`.
+        source: identifies the source of a `Feedback`.
         vote: defines if `Label.value` should be considered True or False
 
     Remarks:
@@ -93,7 +96,7 @@ class LabelFeedback(Label):
         when a value is invalidated, it does not appear in `Target.current`
     """
 
-    identifier: Optional[str] = FEEDBACK_M2M_IDENTIFIER
+    source: Optional[str] = FEEDBACK_M2M_IDENTIFIER
     vote: FeedbackVote = FeedbackVote.VALID
 
 
@@ -157,8 +160,6 @@ class Feedback(BaseModel):
     Contain aggregated confirmations, deletions or modifications for a `Prediction` values.
     """
 
-    identifier: Optional[str] = ""
-    date: Optional[float] = None
     comment: str = ""
     result: Dict[
         str, Union[List[LabelFeedback], LabelFeedback]
