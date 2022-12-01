@@ -67,12 +67,13 @@ class Label(BaseModel):
     Information produced about a `Target` and its connected `Artefact` documents,
 
     Args:
+        lid: a unique identifier for the Label
         value: Information on the label.
           There can be only one Label with the same `value` in a `multiple prediction field`
         clues: List of ClueType objects to explain `value`
     """
 
-    xid: uuid.UUID = Field(default_factory=uuid.uuid4)
+    lid: uuid.UUID = Field(default_factory=uuid.uuid4)
     value: Optional[ValueType]
     clues: List[ClueType] = []
 
