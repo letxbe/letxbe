@@ -63,7 +63,9 @@ metadata = Metadata(
         other_role: {"slug": other_artefact_slug}
     }
 )
-file = open("your_artefact_file.csv", "rb").read()
+
+filename = "your_artefact_file.csv"
+file = (filename, open(filename, "rb").read())
 
 new_artefact_slug = lxb.post_artefact(
     atms_slug, role, metadata, file
@@ -89,7 +91,9 @@ metadata = Metadata(
         artefact_role: {"slug": artefact_slug}
     }
 )
-file = open("your_target_file.pdf", "rb").read()
+
+filename = "your_target_file.csv"
+file = (filename, open(filename, "rb").read())
 
 NEW_TARGET_SLUG = lxb.post_target(atms_slug, metadata, file)
 ```

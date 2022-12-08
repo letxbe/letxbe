@@ -72,7 +72,7 @@ class LXB:
         Args:
             route (str): URL to post the document to.
             metadata (Metadata): Document metadata.
-            file (bytes, optional): File to post.
+            file (Tuple[str, bytes], optional): Filename and bytes to post for a File.
 
         Returns:
             Text of the HTTP response.
@@ -105,7 +105,7 @@ class LXB:
         Args:
             automatisme_slug (str): Slug of the automatisme.
             metadata (Metadata): Metadata of the target.
-            file (bytes, optional): Binary content of the target.
+            file (Tuple[str, bytes], optional): Filename and bytes to post as a Target.
 
         Returns:
             `slug` of the new document.
@@ -131,7 +131,7 @@ class LXB:
             automatisme_slug (str): Slug of the automatisme.
             role (str): Role of the artefact.
             metadata (Metadata): Metadata of the artefact.
-            file (bytes, optional): Binary content of the artefact.
+            file (Tuple[str, bytes], optional): Filename and bytes to post as an Artefact.
 
         Returns:
             `slug` of the new document.
