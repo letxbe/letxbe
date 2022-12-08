@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Optional, Union, cast
+from typing import Dict, Optional, Tuple, Union, cast
 
 import requests
 
@@ -62,7 +62,7 @@ class LXB:
         self,
         route: str,
         metadata: Metadata,
-        file: Optional[bytes],
+        file: Optional[Tuple[str, bytes]],
     ) -> str:
         """
         Post a document.
@@ -77,8 +77,8 @@ class LXB:
         Returns:
             Text of the HTTP response.
         """
-        files: Dict[str, Union[str, bytes]] = {
-            "metadata": json.dumps(metadata.dict()),
+        files: Dict[str, Tuple[str, Union[str, bytes]]] = {
+            "metadata": ("metadata.json", json.dumps(metadata.dict())),
         }
         if file is not None:
             files["file"] = file
@@ -97,7 +97,7 @@ class LXB:
         self,
         automatisme_slug: str,
         metadata: Metadata,
-        file: Optional[bytes] = None,
+        file: Optional[Tuple[str, bytes]] = None,
     ) -> str:
         """
         Post a target.
@@ -122,7 +122,7 @@ class LXB:
         automatisme_slug: str,
         role: str,
         metadata: Metadata,
-        file: Optional[bytes] = None,
+        file: Optional[Tuple[str, bytes]] = None,
     ) -> str:
         """
         Post an artefact.
