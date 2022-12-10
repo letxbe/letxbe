@@ -7,7 +7,12 @@ from .enum import ActionCode, ClientEnv, DocumentStatus
 
 FormValueType = Union[List[ValueType], ValueType]
 
-FormResultType = Dict[str, Optional[FormValueType]]
+
+class FormResultType(BaseModel):
+    __root__: Dict[str, Optional[Union[FormValueType, "FormResultType"]]] = {}
+
+
+FormResultType.update_forward_refs()
 
 
 class Form(BaseModel):
@@ -23,7 +28,7 @@ class Form(BaseModel):
           holds complete information about it.
     """
 
-    result: FormResultType = {}
+    result: FormResultType = FormResultType()
 
 
 class MetadataMixin(BaseModel):

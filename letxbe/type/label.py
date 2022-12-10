@@ -124,12 +124,32 @@ class LabelPrediction(Label):
     children: Optional[List[ChildConnection]] = None
 
 
+CurrentValueType = Union[List[Label], Label]
+
+
+class CurrentResultType(BaseModel):
+    __root__: Dict[str, Union[CurrentValueType, "CurrentResultType"]] = {}
+
+
+CurrentResultType.update_forward_refs()
+
+
 class Current(BaseModel):
     """
     Define the current value of a target list of labels based on Prediction and Feedback
     """
 
-    result: Dict[str, Union[List[Label], Label]] = {}
+    result: CurrentResultType = CurrentResultType()
+
+
+PredictionValueType = Union[List[LabelPrediction], LabelPrediction]
+
+
+class PredictionResultType(BaseModel):
+    __root__: Dict[str, Union[PredictionValueType, "PredictionResultType"]] = {}
+
+
+PredictionResultType.update_forward_refs()
 
 
 class Prediction(BaseModel):
@@ -153,7 +173,17 @@ class Prediction(BaseModel):
     model_version: Optional[str] = None
     score: Optional[float] = Field(None, ge=0, le=100)
     comment: str = ""
-    result: Dict[str, Union[List[LabelPrediction], LabelPrediction]] = {}
+    result: PredictionResultType = PredictionResultType()
+
+
+FeedbackValueType = Union[List[LabelFeedback], LabelFeedback]
+
+
+class FeedbackResultType(BaseModel):
+    __root__: Dict[str, Union[FeedbackValueType, "FeedbackResultType"]] = {}
+
+
+FeedbackResultType.update_forward_refs()
 
 
 class Feedback(BaseModel):
@@ -162,6 +192,6 @@ class Feedback(BaseModel):
     """
 
     comment: str = ""
-    result: Dict[
-        str, Union[List[LabelFeedback], LabelFeedback]
-    ] = {}  # may be a list for type multi-class
+    result: FeedbackResultType = (
+        FeedbackResultType()
+    )  # may be a list for type multi-class
