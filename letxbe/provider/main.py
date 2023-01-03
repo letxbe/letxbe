@@ -43,7 +43,6 @@ def split_to_vecs(data: Tuple[SaverArgType]) -> list:
                     ]
                 ]
             continue
-        print(element)
         raise ValueError("Element must be an instance of `SaverArgType`.")
 
     vec_size = len(shift_map[first_shift])
