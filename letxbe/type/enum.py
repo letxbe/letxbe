@@ -61,3 +61,17 @@ class Url(str, Enum):
         "/api/automatisme/{automatisme_slug:s}/document/{document_slug:s}/feedback"
     )
     GET_DOCUMENT = "/api/automatisme/{automatisme_slug:s}/document/{document_slug:s}"
+
+
+class ServiceUrl(str, Enum):
+    TASKS = "/api/service/{service:s}/task"
+    SAVE = "/api/service/{service:s}/task/{task:s}/save"
+    FINISH = "/api/service/{service:s}/task/{task:s}/finish"
+    TARGET = "/api/service/{service:s}/task/{task:s}/document"
+    TARGET_RESOURCE = "/api/service/{service:s}/task/{task:s}/resource/{resource:s}"
+    TARGET_PROJECTION = "/api/service/{service:s}/task/{task:s}/resource/{resource:s}/projection/{pkey:s}"
+    ARTEFACT = "/api/service/{service:s}/task/{task:s}/role/{role:s}/document"
+    ARTEFACT_RESOURCE = (
+        "/api/service/{service:s}/task/{task:s}/role/{role:s}/resource/{resource:s}"
+    )
+    ARTEFACT_PROJECTION = "/api/service/{service:s}/task/{task:s}/role/{role:s}/resource/{resource:s}/projection/{pkey:s}"

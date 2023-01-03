@@ -1,62 +1,17 @@
 import json
-from typing import Dict, Optional, Tuple, Union, cast
+from typing import Dict, Optional, Tuple, Union
 
 import requests
 
-from .exception import AuthorizationError, AutomationError, UnkownRessourceError
-from .type import Artefact, Feedback, FeedbackResponse, Metadata, Target
-from .type.enum import Url
-
-BASE_URL = "https://prod-unfold.onogone.com"
+from letxbe.session import LXBSession
+from letxbe.type import Artefact, Feedback, FeedbackResponse, Metadata, Target
+from letxbe.type.enum import Url
 
 
-class LXB:
+class LXB(LXBSession):
     """
     Connect to LetXBe and share requests.
     """
-
-    def __init__(
-        self, client_id: str, client_secret: str, server_address: Optional[str] = None
-    ):
-        self.__server_address = BASE_URL if server_address is None else server_address
-        self.__token = self._connect(client_id, client_secret)
-
-    def _connect(self, client_id: str, client_secret: str) -> str:
-        """
-        Connect with LetXBe.
-
-        Args:
-            client_id (str): Auth0 client ID.
-            client_secret (str): Auth0 client secret.
-        Raises:
-            AuthorizationError: Invalid credentials.
-        """
-        response = requests.post(
-            self.__server_address + Url.LOGIN,
-            json={
-                "client_id": client_id,
-                "client_secret": client_secret,
-            },
-        )
-
-        if response.status_code == 403:
-            raise AuthorizationError(f"Invalid credentials: {response.text}")
-
-        return cast(str, response.json()["access_token"])
-
-    def _verify_status_code(self, res: requests.Response) -> None:
-        if res.status_code == 403:
-            raise AuthorizationError(res.reason)
-
-        if res.status_code == 404:
-            raise UnkownRessourceError(res.reason)
-
-        if res.status_code == 500:
-            raise AutomationError(res.reason)
-
-    @property
-    def authorization_header(self) -> Dict:
-        return {"Authorization": "Bearer " + self.__token}
 
     def _post_document(
         self,
@@ -111,7 +66,7 @@ class LXB:
             `slug` of the new document.
         """
         return self._post_document(
-            route=self.__server_address
+            route=self.server
             + Url.POST_DOCUMENT.format(automatisme_slug=automatisme_slug),
             metadata=metadata,
             file=file,
@@ -137,7 +92,7 @@ class LXB:
             `slug` of the new document.
         """
         return self._post_document(
-            route=self.__server_address
+            route=self.server
             + Url.POST_ARTEFACT.format(automatisme_slug=automatisme_slug, role=role),
             metadata=metadata,
             file=file,
@@ -161,11 +116,11 @@ class LXB:
             FeedbackResponse object containing a list of updated labels.
         """
         response = requests.post(
-            url=self.__server_address
+            url=self.server
             + Url.POST_FEEDBACK.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
-            data=feedback.dict(),
+            json=feedback.dict(),
             headers=self.authorization_header,
         )
 
@@ -180,7 +135,7 @@ class LXB:
     ) -> Union[Artefact, Target]:
 
         response = requests.get(
-            url=self.__server_address
+            url=self.server
             + Url.GET_DOCUMENT.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
