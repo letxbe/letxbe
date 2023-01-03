@@ -4,7 +4,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from letxbe.exception import AuthorizationError
-from letxbe.main import BASE_URL, LXB
+from letxbe.main import LXB
+from letxbe.session import BASE_URL
 from letxbe.type import Metadata
 from letxbe.type.enum import Url
 
