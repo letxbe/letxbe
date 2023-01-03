@@ -18,9 +18,6 @@ def split_to_vecs(data: Tuple[SaverArgType]) -> list:
     first_shift = 0
     shift_map: Dict[int, Dict[int, Union[list, dict]]] = {first_shift: {}}
 
-    if isinstance(data, Prediction):
-        data = [data]
-
     for vec_idx, element in enumerate(data):
 
         if isinstance(element, Prediction):
@@ -43,6 +40,7 @@ def split_to_vecs(data: Tuple[SaverArgType]) -> list:
                     ]
                 ]
             continue
+
         raise ValueError("Element must be an instance of `SaverArgType`.")
 
     vec_size = len(shift_map[first_shift])
