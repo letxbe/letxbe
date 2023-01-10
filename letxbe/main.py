@@ -12,7 +12,7 @@ BASE_URL = "https://prod-unfold.onogone.com"
 
 class LXB:
     """
-    Connect to LetXbe and share requests.
+    Connect to LetXBe and share requests.
     """
 
     def __init__(
@@ -23,7 +23,7 @@ class LXB:
 
     def _connect(self, client_id: str, client_secret: str) -> str:
         """
-        Connect with LetXbe.
+        Connect with LetXBe.
 
         Args:
             client_id (str): Auth0 client ID.

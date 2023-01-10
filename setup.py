@@ -11,7 +11,7 @@ requires = [
 
 ROOT = os.path.dirname(__file__)
 VERSION_RE = re.compile(r"""__version__ = ['"]([0-9.]+)['"]""")
-README_PATH = "README.md"
+README_PATH = os.path.join(ROOT, "README.md")
 
 
 def get_version() -> str:
@@ -37,11 +37,11 @@ setup(
     description="Python API to connect and control LXB services",
     long_description=open(README_PATH).read(),
     long_description_content_type="text/markdown",
-    url="https://bitbucket.org/onogone/letxbe/",  # TODO to be changed
+    url="https://automate.letxbe.ai/",
     license="MIT",
     project_urls={
-        "Source": "https://github.com/letxbeai/letxbe",  # TODO to be validated
-        "Tracker": "https://github.com/letxbeai/letxbe/issues",  # TODO to be validated
+        "Source": "https://github.com/letxbe/letxbe",
+        "Tracker": "https://github.com/letxbe/letxbe/issues",
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
