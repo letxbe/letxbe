@@ -1,9 +1,9 @@
 # letxbe
 [![pydantic](https://img.shields.io/badge/dependencies-pydantic-brightgreen)](https://pydantic-docs.helpmanual.io/)
 [![pydantic](https://img.shields.io/badge/dependencies-requests-brightgreen)](https://pypi.org/project/requests)
-![Circle CI](https://img.shields.io/circleci/build/bitbucket/onogone/letxbe?token=00601288e2fce2f6e8f35da8bcc0e154342f8eed)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
-![MIT Licence](https://img.shields.io/github/license/letxbeai/letxbe)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Circle CI](https://img.shields.io/circleci/build/bitbucket/onogone/letxbe?token=00601288e2fce2f6e8f35da8bcc0e154342f8eed)
 
 Connect and control [LetXBe services](http://letxbe.ai/) via a python API.
 
@@ -12,14 +12,15 @@ and the necessary types to handle input and output data.
 
 ## Install
 
-To install the package simply run `pip install letxbe`.
+To install the package run `pip install git+https://github.com/letxbe/letxbe.git`.
 
-Developers should install dev-requirements via `pip install -r requirements-dev.txt`.
+### Developers
+
+Developers should clone the repository via `git clone` and then install the developers
+requirements via `pip install -r requirements-dev.txt`.
 
 
 # Basic usage
-> :warning: You need to set the `SERVER_ADDRESS` environment variable. 
-> It should point to the API you mean to use (dev or prod environment).
 
 The main object used in this package is the class `LXB` that must be initialized to
 establish the connection with our servers.
@@ -42,6 +43,15 @@ property `LXB.authorization_header`.
 
 
 ## Common actions
+
+#### Recommendations
+Whenever you post a document, remember to include the extension in the `filename`, e.g.,
+* not valid filename: `my_awesome_pdf`;
+* valid filename: `my_awesome_pdf.pdf`.
+
+A filename without extension would not be parsed unless explicitly declared in the
+automatisme configuration.
+
 ### Post an artefact
 ```python
 from letxbe.type import ClientEnv, Metadata
@@ -70,6 +80,7 @@ file = (filename, open(filename, "rb").read())
 new_artefact_slug = lxb.post_artefact(
     atms_slug, role, metadata, file
 )
+# >  new_artefact_slug = "your_artefact_file051394-16733444059802482"
 ```
 
 ### Post a target connected to an artefact
@@ -95,7 +106,8 @@ metadata = Metadata(
 filename = "your_target_file.csv"
 file = (filename, open(filename, "rb").read())
 
-NEW_TARGET_SLUG = lxb.post_target(atms_slug, metadata, file)
+new_target_slug = lxb.post_target(atms_slug, metadata, file)
+# >  new_target_slug = "your_target_file051394-16733444059802482"
 ```
 
 ### Post a feedback
@@ -134,12 +146,17 @@ document = lxb.get_document(atms_slug, doc_slug)
 
 ## Known issues
 
+The response of `get_document` contains hard-coded enum values.
+
+
 ## Report an issue
 
 Use github default issue tracker or contact us via email at 
 [team@letxbe.ai](mailto:team@letxbe.ai).
 
 # TODO
+* add examples of artefact and target in return
+* add documentation on artefact/target key-value pairs
 * Generate documentation for type sub-package
 * Add better handling of HTTP status when there's an error
 * Use python badge shields based on classifiers in setup, see
@@ -147,7 +164,7 @@ Use github default issue tracker or contact us via email at
 
 # License
 
-MIT Licence.
+MIT License, see `LICENSE` for more information.
 
 # Changelog
 
@@ -155,6 +172,6 @@ MIT Licence.
 
 ### Alpha
 
-* added LXB class to connect to LetXBe API
+* added LXB class to connect to LetXBe API and basic README documentation
 * simple api calls: get_document, post_target, post_artefact, post_feedback
 * basic typing for input/output
