@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple, Union
 import requests
 
 from letxbe.exception import AutomationError
-from letxbe.provider.type import Prediction
+from letxbe.provider.type import Prediction, Projection, Page
 from letxbe.session import LXBSession
 from letxbe.utils import bytes_to_zipfile, pydantic_model_to_json, zipfile_to_byte_files
 
@@ -14,6 +14,10 @@ MAX_SAVER_LIST_LEN = 10
 
 
 def split_to_vecs(data: Tuple[SaverArgType]) -> list:
+    """
+    Slit a tuple of `SaverArgType` objects into a list of tuples with fewer elements each
+      in order to save it components in batches.
+    """
 
     first_shift = 0
     shift_map: Dict[int, Dict[int, Union[list, dict]]] = {first_shift: {}}
@@ -173,22 +177,66 @@ class Provider(LXBSession):
             task_slug=task_slug, status_code=status_code, text=text, exception=exception
         )
 
+    def download_document_file(
+        self,
+        task_slug: str,
+        role: Optional[str] = None
+    ) -> List[Tuple[str, bytes]]:
+        """
+        Download a Document file.
+
+        Returns:
+            A file as bytes.
+        """
+
+        url = self.session.server
+
+        if role is None:
+            url += ServiceUrl.TARGET_RESOURCE.format(
+                provider=self.urn, task=task_slug, resource=DownloadResource.FILE
+            )
+        else:
+            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+                provider=self.urn, task=task_slug, role=role, resource=DownloadResource.FILE
+            )
+
+        response = requests.get(
+            url=url,
+            headers=self.session.authorization_header,
+        )
+
+        self.session._verify_status_code(response)
+
+        return response.content
+
     def download_images(
         self,
         task_slug: str,
+        role: Optional[str] = None
     ) -> List[Tuple[str, bytes]]:
         """
-        Take responsibility for the next task to be executed by service.
+        Download `Page` object images that can be used to complete the task.
 
         Returns:
-            Text of the HTTP response.
+            A list of tuples containing an image filename and bytes.
+
+        # TODO include a list of `page_idx` values as an optional argument
+          to filter images
         """
 
-        response = requests.get(
-            url=self.session.server
-            + ServiceUrl.TARGET_RESOURCE.format(
+        url = self.session.server
+
+        if role is None:
+            url += ServiceUrl.TARGET_RESOURCE.format(
                 provider=self.urn, task=task_slug, resource=DownloadResource.IMAGE
-            ),
+            )
+        else:
+            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+                provider=self.urn, task=task_slug, role=role, resource=DownloadResource.IMAGE
+            )
+
+        response = requests.get(
+            url=url,
             headers=self.session.authorization_header,
         )
 
@@ -196,3 +244,157 @@ class Provider(LXBSession):
 
         zipped = bytes_to_zipfile(response.content)
         return zipfile_to_byte_files(zipped)
+
+    def download_service_file(
+        self,
+        task_slug: str,
+        filename: str to be used, 
+        role: Optional[str] = None
+    ) -> bytes:
+        """
+        Download a service file related to this task, by providing its name.
+
+        See `upload_service_file` for more information.
+
+        Returns:
+            A file as bytes.
+        """
+
+        url = self.session.server
+
+        if role is None:
+            url += ServiceUrl.TARGET_RESOURCE.format(
+                provider=self.urn, task=task_slug, resource=DownloadResource.SERVICE_FILE
+            )
+        else:
+            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+                provider=self.urn, task=task_slug, role=role, resource=DownloadResource.SERVICE_FILE
+            )
+
+        response = requests.get(
+            url=url,
+            headers=self.session.authorization_header,
+        )
+
+        self.session._verify_status_code(response)
+
+        return response.content
+
+    def upload_service_file(
+        self,
+        task_slug: str,
+        filename: str to be used,
+        file: bytes,
+        role: Optional[str] = None
+    ) -> None:
+        """
+        Upload a service file related to this task, by providing its name.
+
+        A service file is a file that relates to a service and document,
+          that can be used by the service to process a task through multiple steps
+          the document relates to as the `Target` or an `Artefact` with a given role.
+
+        Returns:
+            None
+        """
+
+        url = self.session.server
+
+        if role is None:
+            url += ServiceUrl.TARGET_RESOURCE.format(
+                provider=self.urn, task=task_slug, resource=DownloadResource.SERVICE_FILE
+            )
+        else:
+            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+                provider=self.urn, task=task_slug, role=role, resource=DownloadResource.SERVICE_FILE
+            )
+
+        files: Dict[str, Tuple[str, bytes]] = {
+            "file": (filename, file),
+        }
+
+        response = requests.post(
+            url=url,
+            files=files,
+            headers=self.session.authorization_header,
+        )
+
+        self.session._verify_status_code(response)
+
+        return None
+
+    def download_pages(
+        self,
+        task_slug: str,
+        role: Optional[str] = None
+    ) -> List[Page]:
+        """
+        Download `Page` objects associated to a Document.
+
+        Returns:
+            A list of `Page` objects.
+
+        # TODO include a list of `page_idx` values as an optional argument
+          to filter pages
+        """
+
+        url = self.session.server
+
+        if role is None:
+            url += ServiceUrl.TARGET_RESOURCE.format(
+                provider=self.urn, task=task_slug, resource=DownloadResource.PAGE
+            )
+        else:
+            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+                provider=self.urn, task=task_slug, role=role, resource=DownloadResource.PAGE
+            )
+
+        response = requests.get(
+            url=url,
+            headers=self.session.authorization_header,
+        )
+
+        self.session._verify_status_code(response)
+
+        document_metadata = response.json()
+
+        return [Page.parse_obj(page) for page in document_metadata["result"]]
+
+    def download_projections(
+        self,
+        task_slug: str,
+        pkey: str, 
+        role: Optional[str] = None
+    ) -> List[Projection]:
+        """
+        Download `Projection` objects associated to a Document
+          for a given projection key.
+
+        Returns:
+            A list of `Projection` objects.
+
+        # TODO include a list of `xid` values as an optional argument
+          to filter projections
+        """
+
+        url = self.session.server
+
+        if role is None:
+            url += ServiceUrl.TARGET_PROJECTION.format(
+                provider=self.urn, task=task_slug, pkey=pkey, resource=DownloadResource.PROJECTION
+            )
+        else:
+            url += ServiceUrl.ARTEFACT_PROJECTION.format(
+                provider=self.urn, task=task_slug, role=role, pkey=pkey, resource=DownloadResource.PROJECTION
+            )
+
+        response = requests.get(
+            url=url,
+            headers=self.session.authorization_header,
+        )
+
+        self.session._verify_status_code(response)
+
+        document_metadata = response.json()
+
+        return [Projection.parse_obj(page) for page in document_metadata["result"]]

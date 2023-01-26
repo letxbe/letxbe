@@ -7,17 +7,17 @@ from letxbe.type.base import ValueType
 
 class __ProjectionBase(BaseModel):
     """
-    Define base for all elements in ProjectionRoot.result.
+    Define base for all elements in Projection.result.
 
     Related to :
 
-    ProjectionRoot: Uses `ProjectionRoot.calculate_projection_entry` to set projection_entry.
+    Projection: Uses `Projection.calculate_projection_entry` to set projection_entry.
 
     Prediction: Use `projection_entry` to associate a ProjectionMap to a prediction using a ProjectionClue.
     Use `extract_remaining_projection_structure_from_entry_point` in flow.service.projection to find ProjectionMap based on projection_entry stored in a clue.
 
-    projection_entry: identifier for a ProjectionMap inside a ProjectionRoot structure.
-        this identifier is not stored in database but calculated when instanciating ProjectionRoot.
+    projection_entry: identifier for a ProjectionMap inside a Projection structure.
+        this identifier is not stored in database but calculated when instanciating Projection.
     """
 
     projection_entry: str = ""
@@ -60,7 +60,7 @@ ProjectionMapValueType = Union[
 ProjectionMap.update_forward_refs()
 
 
-class ProjectionRoot(ProjectionMap):
+class Projection(ProjectionMap):
     """
     Defines the content of Target or Artefact that corresponds to a line in a table or flat JSON form.
     Fields may be a list of values with the same type.
