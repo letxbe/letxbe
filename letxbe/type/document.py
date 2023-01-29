@@ -60,16 +60,18 @@ class ParentDocument(BaseModel):
 
     atms_slug: Slug of the Automatisme of the `Parent`.
     doc_slug: Slug of the `Parent`.
-    content: list `page_idx` values for `Page` objects from Parent.content,
-        when they should be considered as elements of Child.content.
-    projection: map lists of `xid` values for `ProjectionRoot` objects from Parent.projection,
-        when they should be considered as elements of Child.projection.
+    content: a filter that lists `page_idx` values from Parent.content `Page` objects that should be kept in Child.content.
+        If no `Page` objects should be transferred, use []
+        If all `Page` objects should be transferred, use None
+    projection: a filter that lists `xid` values from Parent.projection[...] `ProjectionRoot` objects that should be kept in Child.projection
+        If no `ProjectionRoot` objects should be transferred, use [] or do not cite `pkey` in `Parent.projection`
+        If all `ProjectionRoot` objects should be transferred, use None
     """
 
     atms_slug: str
     doc_slug: str
-    content: List[int] = []
-    projection: Dict[str, List[str]] = {}
+    content: Optional[List[int]] = []
+    projection: Dict[str, Optional[List[str]]] = {}
 
 
 class WithParentMixin(BaseModel):
