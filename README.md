@@ -171,6 +171,11 @@ file name is lost and cannot be recovered.
 We are working to make every error explicit and documented. For the moment, there are
 chances that you encounter not-documented and/or not-explicit errors.
 
+#### Too large files
+Files exceeding 100MB cannot be posted for the moment due to Tornado limitations.
+We are working to support larger files.
+
+
 ## Report an issue
 
 Use github default issue tracker or contact us via email at 
@@ -182,6 +187,7 @@ Use github default issue tracker or contact us via email at
 * add documentation of values for `status_code`
 * Generate documentation for type sub-package
 * Add better handling of HTTP status when there's an error
+* explicit error for files greater than 100MB
 * Use python badge shields based on classifiers in setup, see
   https://shields.io/category/platform-support
 
