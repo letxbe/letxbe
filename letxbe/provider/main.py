@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple, Union
 import requests
 
 from letxbe.exception import AutomationError
-from letxbe.provider.type import Prediction, Projection, Page
+from letxbe.provider.type import Page, Prediction, Projection
 from letxbe.session import LXBSession
 from letxbe.utils import bytes_to_zipfile, pydantic_model_to_json, zipfile_to_byte_files
 

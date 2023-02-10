@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Circle CI](https://img.shields.io/circleci/build/bitbucket/onogone/letxbe?token=00601288e2fce2f6e8f35da8bcc0e154342f8eed)
 
-Connect and control [LetXBe services](http://letxbe.ai/) via a python API.
+Connect and control [LetXbe services](http://letxbe.ai/) via a python API.
 
-**letxbe** package contains an API wrapper to connect to [LetXBe API](http://letxbe.ai/)
+**letxbe** package contains an API wrapper to connect to [LetXbe API](http://letxbe.ai/)
 and the necessary types to handle input and output data.
 
 ## Install
@@ -39,7 +39,7 @@ A filename without extension would not be parsed unless explicitly declared in t
 automatisme configuration.
 
 #### Large batch of files
-LetXBe does not support processing a batch of files, i.e., it is not possible to send
+LetXbe does not support processing a batch of files, i.e., it is not possible to send
 a list of files.
 
 As of today, the best practice to parse a large amount of files, is to send them one
@@ -195,6 +195,6 @@ MIT License, see `LICENSE` for more information.
 
 ### Alpha
 
-* added LXB class to connect to LetXBe API and basic README documentation
+* added LXB class to connect to LetXbe API and basic README documentation
 * simple api calls: get_document, post_target, post_artefact, post_feedback
 * basic typing for input/output

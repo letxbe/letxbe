@@ -32,7 +32,7 @@ setup(
         ],
     },
     python_requires=">=3.7",
-    author="LetXBe developers",
+    author="LetXbe developers",
     author_email="team@letxbe.ai",
     description="Python API to connect and control LXB services",
     long_description=open(README_PATH).read(),

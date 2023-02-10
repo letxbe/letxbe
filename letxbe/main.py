@@ -10,7 +10,7 @@ from letxbe.type.enum import Url
 
 class LXB(LXBSession):
     """
-    Connect to LetXBe and share requests.
+    Connect to LetXbe and share requests.
     """
 
     def _post_document(
