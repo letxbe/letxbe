@@ -60,7 +60,7 @@ ProjectionMapValueType = Union[
 ProjectionMap.update_forward_refs()
 
 
-class Projection(ProjectionMap):
+class ProjectionRoot(ProjectionMap):
     """
     Defines the content of Target or Artefact that corresponds to a line in a table or flat JSON form.
     Fields may be a list of values with the same type.
