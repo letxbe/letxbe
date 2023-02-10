@@ -46,7 +46,8 @@ class LXB(LXBSession):
 
         self._verify_status_code(response)
 
-        return response.json()  # type: ignore [no-any-return]
+        reponse: str = response.json()
+        return reponse
 
     def post_target(
         self,
