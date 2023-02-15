@@ -46,7 +46,9 @@ class LXBSession:
 
         return cast(str, response.json()["access_token"])
 
-    def _verify_status_code(self, res: requests.Response) -> None:
+    @staticmethod
+    def _verify_status_code(res: requests.Response) -> None:
+        # TODO @pierre: what if the response.status_code is different from 200?
         if res.status_code == 403:
             raise AuthorizationError(res.reason)
 
