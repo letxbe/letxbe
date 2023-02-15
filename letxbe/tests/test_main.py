@@ -11,12 +11,12 @@ from letxbe.type.enum import Url
 
 
 @pytest.fixture
-def mock_lxb():
+def mock_lxb(mock_access_token):
 
     with patch(
         "letxbe.main.requests.post",
         return_value=Mock(
-            status_code=201, json=lambda: {"access_token": "some_access_token"}
+            status_code=201, json=lambda: {"access_token": mock_access_token}
         ),
     ):
         lxb = LXB("", "")

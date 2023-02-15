@@ -14,8 +14,18 @@ from .utils import split_data_into_batches
 class Provider(LXBSession):
     # TODO add documentation
 
-    def __init__(self, provider_urn: str, *args: str, **kwargs: str) -> None:
-        super(LXBSession, self).__init__(*args, **kwargs)
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        provider_urn: str,
+        server_address: Optional[str] = None,
+    ) -> None:
+        super(Provider, self).__init__(
+            client_id=client_id,
+            client_secret=client_secret,
+            server_address=server_address,
+        )
         self.__urn = provider_urn
 
     @property
@@ -31,7 +41,7 @@ class Provider(LXBSession):
 
     def take_charge(
         self,
-    ) -> Task:
+    ) -> Optional[Task]:
         """
         Take charge for the next task to be executed by the service provider.
 
@@ -42,10 +52,13 @@ class Provider(LXBSession):
             url=self.server + ServiceUrl.TASKS.format(provider=self.urn),
             headers=self.authorization_header,
         )
-
         self._verify_status_code(response)
 
-        return Task.parse_obj(response.json())
+        response_json = response.json()
+        if response_json == {}:
+            return None
+
+        return Task.parse_obj(response_json)
 
     def save_and_finish(
         self,
