@@ -14,21 +14,16 @@ from .utils import split_data_into_batches
 class Provider(LXBSession):
     # TODO add documentation
 
-    # TODO Provider should not be initializated by its parent class
-    def __init__(self, session: LXBSession, provider_urn: str):
-        self.__session = session
+    def __init__(self, provider_urn: str, *args: str, **kwargs: str) -> None:
+        super(LXBSession, self).__init__(*args, **kwargs)
         self.__urn = provider_urn
-
-    @property
-    def session(self) -> LXBSession:
-        return self.__session
 
     @property
     def urn(self) -> str:
         return self.__urn
 
-    def _verify_response(self, res: requests.Response) -> None:
-        self.session._verify_status_code(res)
+    def _verify_response_is_success(self, res: requests.Response) -> None:
+        self._verify_status_code(res)
 
         if "success" not in res.json():
             raise AutomationError(f"Error in response: {res}")
@@ -44,11 +39,11 @@ class Provider(LXBSession):
             A Task object.
         """
         response = requests.post(
-            url=self.session.server + ServiceUrl.TASKS.format(provider=self.urn),
-            headers=self.session.authorization_header,
+            url=self.server + ServiceUrl.TASKS.format(provider=self.urn),
+            headers=self.authorization_header,
         )
 
-        self.session._verify_status_code(response)
+        self._verify_status_code(response)
 
         return Task.parse_obj(response.json())
 
@@ -98,13 +93,12 @@ class Provider(LXBSession):
     ) -> None:
 
         res = requests.post(
-            url=self.session.server
-            + ServiceUrl.SAVE.format(provider=self.urn, task=task_slug),
+            url=self.server + ServiceUrl.SAVE.format(provider=self.urn, task=task_slug),
             json=data,
-            headers=self.session.authorization_header,
+            headers=self.authorization_header,
         )
 
-        self._verify_response(res)
+        self._verify_response_is_success(res)
         return
 
     def _finish(
@@ -117,13 +111,13 @@ class Provider(LXBSession):
         }
 
         res = requests.post(
-            url=self.session.server
+            url=self.server
             + ServiceUrl.FINISH.format(provider=self.urn, task=task_slug),
-            headers=self.session.authorization_header,
+            headers=self.authorization_header,
             data=data,
         )
 
-        self._verify_response(res)
+        self._verify_response_is_success(res)
         return
 
     def download_document_file(
@@ -144,7 +138,7 @@ class Provider(LXBSession):
             A tuple containing the filename (str) and the file (bytes).
         """
 
-        url = self.session.server
+        url = self.server
 
         if role is None:
             # TODO change naming of TARGET_RESOURCE and ARTEFACT_RESOURCE as `role`
@@ -162,10 +156,10 @@ class Provider(LXBSession):
 
         res = requests.get(
             url=url,
-            headers=self.session.authorization_header,
+            headers=self.authorization_header,
         )
 
-        self._verify_response(res)
+        self._verify_response_is_success(res)
 
         # TODO add filename in output
         return "FILENAME-TO-BE-ADDED", res.content
@@ -183,7 +177,7 @@ class Provider(LXBSession):
           to filter images
         """
 
-        url = self.session.server
+        url = self.server
 
         if role is None:
             # TODO change naming of TARGET_RESOURCE and ARTEFACT_RESOURCE as `role`
@@ -201,10 +195,10 @@ class Provider(LXBSession):
 
         res = requests.get(
             url=url,
-            headers=self.session.authorization_header,
+            headers=self.authorization_header,
         )
 
-        self._verify_response(res)
+        self._verify_response_is_success(res)
 
         # TODO why?
         zipped = bytes_to_zipfile(res.content)
@@ -221,7 +215,7 @@ class Provider(LXBSession):
           to filter pages
         """
 
-        url = self.session.server
+        url = self.server
 
         if role is None:
             # TODO change naming of TARGET_RESOURCE and ARTEFACT_RESOURCE as `role`
@@ -239,10 +233,10 @@ class Provider(LXBSession):
 
         response = requests.get(
             url=url,
-            headers=self.session.authorization_header,
+            headers=self.authorization_header,
         )
 
-        self.session._verify_status_code(response)
+        self._verify_status_code(response)
 
         document_metadata = response.json()
 
@@ -262,7 +256,7 @@ class Provider(LXBSession):
           to filter projections
         """
 
-        url = self.session.server
+        url = self.server
 
         if role is None:
             url += ServiceUrl.TARGET_PROJECTION.format(
@@ -282,10 +276,10 @@ class Provider(LXBSession):
 
         response = requests.get(
             url=url,
-            headers=self.session.authorization_header,
+            headers=self.authorization_header,
         )
 
-        self.session._verify_status_code(response)
+        self._verify_status_code(response)
 
         document_metadata = response.json()
 
