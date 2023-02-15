@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, cast
 
 import requests
 
@@ -63,12 +63,13 @@ class Provider(LXBSession):
     def save_and_finish(
         self,
         task_slug: str,
-        data: Tuple[SaverArgType],
+        data: Tuple[
+            SaverArgType
+        ],  # TODO change this to Union[SaverArgType, Tuple[SaverArgType]]
         status_code: LogStatus = LogStatus.SUCCESS,
         text: str = "",
         exception: str = "",
     ) -> None:
-        # TODO change text and exception messages > they should be directly put in the Label
         """
         Save data coming from a task and end the task to be executed by service.
 
@@ -174,8 +175,9 @@ class Provider(LXBSession):
 
         self._verify_response_is_success(res)
 
-        # TODO add filename in output
-        return "FILENAME-TO-BE-ADDED", res.content
+        # TODO develop and double check on web-service
+        filename, filebytes = res.content
+        return cast(str, filename), cast(bytes, filebytes)
 
     def download_images(
         self, task_slug: str, role: Optional[str] = None
@@ -213,7 +215,6 @@ class Provider(LXBSession):
 
         self._verify_response_is_success(res)
 
-        # TODO why?
         zipped = bytes_to_zipfile(res.content)
         return zipfile_to_byte_files(zipped)
 
