@@ -128,7 +128,9 @@ CurrentValueType = Union[List[Label], Label]
 
 
 class CurrentResultType(BaseModel):
-    __root__: Dict[str, Union[CurrentValueType, "CurrentResultType"]] = {}
+    __root__: Dict[
+        str, Union[CurrentValueType, List["CurrentResultType"], "CurrentResultType"]
+    ] = {}
 
 
 CurrentResultType.update_forward_refs()
@@ -146,7 +148,12 @@ PredictionValueType = Union[List[LabelPrediction], LabelPrediction]
 
 
 class PredictionResultType(BaseModel):
-    __root__: Dict[str, Union[PredictionValueType, "PredictionResultType"]] = {}
+    __root__: Dict[
+        str,
+        Union[
+            PredictionValueType, List["PredictionResultType"], "PredictionResultType"
+        ],
+    ] = {}
 
 
 PredictionResultType.update_forward_refs()
@@ -180,7 +187,9 @@ FeedbackValueType = Union[List[LabelFeedback], LabelFeedback]
 
 
 class FeedbackResultType(BaseModel):
-    __root__: Dict[str, Union[FeedbackValueType, "FeedbackResultType"]] = {}
+    __root__: Dict[
+        str, Union[FeedbackValueType, List["FeedbackResultType"], "FeedbackResultType"]
+    ] = {}
 
 
 FeedbackResultType.update_forward_refs()

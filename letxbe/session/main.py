@@ -48,7 +48,6 @@ class LXBSession:
 
     @staticmethod
     def _verify_status_code(res: requests.Response) -> None:
-        # TODO @pierre: what if the response.status_code is different from 200?
         if res.status_code == 403:
             raise AuthorizationError(res.reason)
 
@@ -57,6 +56,11 @@ class LXBSession:
 
         if res.status_code == 500:
             raise AutomationError(res.reason)
+
+        if res.status_code == 200:
+            return
+
+        raise ValueError(f"Request failed with code {res.status_code}: {res.reason}")
 
     @property
     def authorization_header(self) -> Dict:

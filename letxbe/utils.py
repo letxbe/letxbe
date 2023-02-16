@@ -1,9 +1,21 @@
 import io
 import json
+import re
 from typing import List, Tuple, cast
 from zipfile import ZipFile, is_zipfile
 
+import requests
 from pydantic import BaseModel
+
+
+def extract_filename_from_response_header(res: requests.Response) -> str:
+    d = res.headers["content-disposition"]
+    filename = re.findall("filename=(.+)", d)[0]
+
+    if isinstance(filename, str):
+        return filename
+
+    raise ValueError("Cannot find filename.")
 
 
 def pydantic_model_to_json(model: BaseModel) -> dict:

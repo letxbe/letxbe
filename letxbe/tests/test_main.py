@@ -65,7 +65,7 @@ def test_lxb__connect_and_authorization_header(mocked_post):
 @patch("letxbe.main.requests.get")
 def test_lxb__get_document__artefact(mock_get, mock_target, mock_artefact, mock_lxb):
     # Given
-    mock_get.return_value = Mock(json=lambda: {"role": "some_role"})
+    mock_get.return_value = Mock(json=lambda: {"role": "some_role"}, status_code=200)
     automatisme_slug = "atms-slug"
     document_slug = "artefact-slug"
 
@@ -82,7 +82,9 @@ def test_lxb__get_document__artefact(mock_get, mock_target, mock_artefact, mock_
 @patch("letxbe.main.requests.get")
 def test_lxb__get_document__target(mock_get, mock_target, mock_artefact, mock_lxb):
     # Given
-    mock_get.return_value = Mock(json=lambda: {"some_key": "some_value"})
+    mock_get.return_value = Mock(
+        json=lambda: {"some_key": "some_value"}, status_code=200
+    )
     automatisme_slug = "atms-slug"
     document_slug = "target-slug"
 
@@ -98,7 +100,7 @@ def test_lxb__get_document__target(mock_get, mock_target, mock_artefact, mock_lx
 @patch("letxbe.main.requests.post")
 def test_lxb___post_document(mock_post, mock_lxb, file):
     # Given
-    mock_post.return_value = Mock(text="")
+    mock_post.return_value = Mock(text="", status_code=200)
     route = Mock()
     metadata = Metadata(
         name="Random number sent as file bytes",

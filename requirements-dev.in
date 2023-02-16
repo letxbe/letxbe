@@ -9,3 +9,4 @@ pydantic
 pytest
 types-requests
 requests
+python-dotenv

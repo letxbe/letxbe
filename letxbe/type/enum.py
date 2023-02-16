@@ -60,6 +60,9 @@ class Url(str, Enum):
     POST_FEEDBACK = (
         "/api/automatisme/{automatisme_slug:s}/document/{document_slug:s}/feedback"
     )
+    POST_PREDICTION = (
+        "/api/automatisme/{automatisme_slug:s}/document/{document_slug:s}/prediction"
+    )
     GET_DOCUMENT = "/api/automatisme/{automatisme_slug:s}/document/{document_slug:s}"
 
 

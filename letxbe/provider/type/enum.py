@@ -13,14 +13,14 @@ class ServiceUrl(str, Enum):
     TASKS = "/api/provider/{provider:s}/task"
     SAVE = "/api/provider/{provider:s}/task/{task:s}/save"
     FINISH = "/api/provider/{provider:s}/task/{task:s}/finish"
-    TARGET = "/api/provider/{provider:s}/task/{task:s}/document"
-    TARGET_RESOURCE = "/api/provider/{provider:s}/task/{task:s}/resource/{resource:s}"
-    TARGET_PROJECTION = "/api/provider/{provider:s}/task/{task:s}/resource/{resource:s}/projection/{pkey:s}"
-    ARTEFACT = "/api/provider/{provider:s}/task/{task:s}/role/{role:s}/document"
-    ARTEFACT_RESOURCE = (
+    DOCUMENT = "/api/provider/{provider:s}/task/{task:s}/document"
+    DOCUMENT_RESOURCE = "/api/provider/{provider:s}/task/{task:s}/resource/{resource:s}"
+    DOCUMENT_PROJECTION = "/api/provider/{provider:s}/task/{task:s}/resource/{resource:s}/projection/{pkey:s}"
+    ROLE = "/api/provider/{provider:s}/task/{task:s}/role/{role:s}/document"
+    ROLE_RESOURCE = (
         "/api/provider/{provider:s}/task/{task:s}/role/{role:s}/resource/{resource:s}"
     )
-    ARTEFACT_PROJECTION = "/api/provider/{provider:s}/task/{task:s}/role/{role:s}/resource/{resource:s}/projection/{pkey:s}"
+    ROLE_PROJECTION = "/api/provider/{provider:s}/task/{task:s}/role/{role:s}/resource/{resource:s}/projection/{pkey:s}"
 
 
 class LogStatus(str, Enum):

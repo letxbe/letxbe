@@ -4,8 +4,16 @@ from typing import Dict, Optional, Tuple, Union
 import requests
 
 from letxbe.session import LXBSession
-from letxbe.type import Artefact, Feedback, FeedbackResponse, Metadata, Target
+from letxbe.type import (
+    Artefact,
+    Feedback,
+    FeedbackResponse,
+    Metadata,
+    Prediction,
+    Target,
+)
 from letxbe.type.enum import Url
+from letxbe.utils import pydantic_model_to_json
 
 
 class LXB(LXBSession):
@@ -18,6 +26,7 @@ class LXB(LXBSession):
         route: str,
         metadata: Metadata,
         file: Optional[Tuple[str, bytes]],
+        slug: Optional[str] = None,
     ) -> str:
         """
         Post a document.
@@ -32,15 +41,20 @@ class LXB(LXBSession):
         Returns:
             Text of the HTTP response.
         """
-        files: Dict[str, Tuple[str, Union[str, bytes]]] = {
-            "metadata": ("metadata.json", json.dumps(metadata.dict())),
-        }
+        files: Dict[str, Tuple[str, Union[str, bytes]]] = {}
         if file is not None:
             files["file"] = file
+
+        metadata_dict = pydantic_model_to_json(metadata)
+        if slug is not None:
+            metadata_dict["slug"] = slug
 
         response = requests.post(
             url=route,
             files=files,
+            data={
+                "metadata": json.dumps(metadata_dict),
+            },
             headers=self.authorization_header,
         )
 
@@ -54,6 +68,7 @@ class LXB(LXBSession):
         automatisme_slug: str,
         metadata: Metadata,
         file: Optional[Tuple[str, bytes]] = None,
+        slug: Optional[str] = None,
     ) -> str:
         """
         Post a target.
@@ -71,6 +86,7 @@ class LXB(LXBSession):
             + Url.POST_DOCUMENT.format(automatisme_slug=automatisme_slug),
             metadata=metadata,
             file=file,
+            slug=slug,
         )
 
     def post_artefact(
@@ -79,6 +95,7 @@ class LXB(LXBSession):
         role: str,
         metadata: Metadata,
         file: Optional[Tuple[str, bytes]] = None,
+        slug: Optional[str] = None,
     ) -> str:
         """
         Post an artefact.
@@ -97,7 +114,36 @@ class LXB(LXBSession):
             + Url.POST_ARTEFACT.format(automatisme_slug=automatisme_slug, role=role),
             metadata=metadata,
             file=file,
+            slug=slug,
         )
+
+    def post_prediction(
+        self,
+        automatisme_slug: str,
+        document_slug: str,
+        prediction: Prediction,
+    ) -> None:
+        """
+        Post a prediction to a given document.
+
+        Args:
+            automatisme_slug (str): Slug of the automatisme.
+            document_slug (str): Slug of the document.
+            prediction (Prediction): Contents of the prediction.
+
+        """
+        response = requests.post(
+            url=self.server
+            + Url.POST_PREDICTION.format(
+                automatisme_slug=automatisme_slug, document_slug=document_slug
+            ),
+            json=prediction.dict(),
+            headers=self.authorization_header,
+        )
+
+        self._verify_status_code(response)
+
+        return None
 
     def post_feedback(
         self,

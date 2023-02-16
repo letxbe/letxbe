@@ -34,10 +34,13 @@ def test__verify_status_code__raise_error(mock_lxbsession, status_code):
 def test__verify_status_code_success(mock_lxbsession):
     # Given
     resp = Response()
-    resp.status_code = secrets.randbelow(400)
+    resp.status_code = secrets.randbelow(200)
 
     # Then
-    assert mock_lxbsession._verify_status_code(resp) is None
+    with pytest.raises(ValueError) as exc_info:
+        mock_lxbsession._verify_status_code(resp)
+
+    assert f"Request failed with code {resp.status_code}" in str(exc_info.value)
 
 
 def test_authorization_header(mock_lxbsession, mock_access_token):

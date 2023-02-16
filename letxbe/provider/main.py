@@ -1,18 +1,31 @@
-from typing import List, Optional, Tuple, Union, cast
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 import requests
 
 from letxbe.exception import AutomationError
-from letxbe.provider.type import Page, ProjectionRoot
+from letxbe.provider.type import (
+    DownloadResource,
+    LogStatus,
+    Page,
+    ProjectionRoot,
+    SaverArgType,
+    ServiceUrl,
+    Task,
+)
 from letxbe.session import LXBSession
-from letxbe.utils import bytes_to_zipfile, zipfile_to_byte_files
-
-from .type import DownloadResource, LogStatus, SaverArgType, ServiceUrl, Task
-from .utils import split_data_into_batches
+from letxbe.utils import (
+    bytes_to_zipfile,
+    extract_filename_from_response_header,
+    pydantic_model_to_json,
+    zipfile_to_byte_files,
+)
 
 
 class Provider(LXBSession):
-    # TODO add documentation
+    """
+    A Provider is a third-party that contributes to processing documents with their own algorithms.
+    This object allows them to load a pending document and resources available to process it.
+    """
 
     def __init__(
         self,
@@ -63,9 +76,7 @@ class Provider(LXBSession):
     def save_and_finish(
         self,
         task_slug: str,
-        data: Tuple[
-            SaverArgType
-        ],  # TODO change this to Union[SaverArgType, Tuple[SaverArgType]]
+        data: Union[SaverArgType, Tuple[SaverArgType]],
         status_code: LogStatus = LogStatus.SUCCESS,
         text: str = "",
         exception: str = "",
@@ -87,13 +98,7 @@ class Provider(LXBSession):
             Text of the HTTP response.
         """
 
-        data_batches = split_data_into_batches(data)
-        for batch in data_batches:
-            if batch is None:
-                # TODO update `split_data_into_batches` not to return None
-                continue
-
-            self._save(task_slug, batch)
+        self._save(task_slug, data)
 
         self._finish(
             task_slug=task_slug, status_code=status_code, text=text, exception=exception
@@ -103,12 +108,25 @@ class Provider(LXBSession):
     def _save(
         self,
         task_slug: str,
-        data: Union[list, dict],
+        data: Union[SaverArgType, Tuple[SaverArgType]],
     ) -> None:
+
+        to_save: List[Union[Dict, List[Dict]]] = []
+
+        if isinstance(data, tuple):
+            tuppled_data = data
+        else:
+            tuppled_data = (data,)
+
+        for vec in tuppled_data:
+            if isinstance(vec, list):
+                to_save += [[pydantic_model_to_json(element) for element in vec]]
+                continue
+            to_save += [pydantic_model_to_json(vec)]
 
         res = requests.post(
             url=self.server + ServiceUrl.SAVE.format(provider=self.urn, task=task_slug),
-            json=data,
+            json=to_save,
             headers=self.authorization_header,
         )
 
@@ -155,13 +173,11 @@ class Provider(LXBSession):
         url = self.server
 
         if role is None:
-            # TODO change naming of TARGET_RESOURCE and ARTEFACT_RESOURCE as `role`
-            #  not None does not mean that the document is a target or an artefact
-            url += ServiceUrl.TARGET_RESOURCE.format(
+            url += ServiceUrl.DOCUMENT_RESOURCE.format(
                 provider=self.urn, task=task_slug, resource=DownloadResource.FILE
             )
         else:
-            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+            url += ServiceUrl.ROLE_RESOURCE.format(
                 provider=self.urn,
                 task=task_slug,
                 role=role,
@@ -175,9 +191,9 @@ class Provider(LXBSession):
 
         self._verify_response_is_success(res)
 
-        # TODO develop and double check on web-service
-        filename, filebytes = res.content
-        return cast(str, filename), cast(bytes, filebytes)
+        fname = extract_filename_from_response_header(res)
+
+        return fname, cast(bytes, res.content)
 
     def download_images(
         self, task_slug: str, role: Optional[str] = None
@@ -195,13 +211,11 @@ class Provider(LXBSession):
         url = self.server
 
         if role is None:
-            # TODO change naming of TARGET_RESOURCE and ARTEFACT_RESOURCE as `role`
-            #  not None does not mean that the document is a target or an artefact
-            url += ServiceUrl.TARGET_RESOURCE.format(
+            url += ServiceUrl.DOCUMENT_RESOURCE.format(
                 provider=self.urn, task=task_slug, resource=DownloadResource.IMAGE
             )
         else:
-            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+            url += ServiceUrl.ROLE_RESOURCE.format(
                 provider=self.urn,
                 task=task_slug,
                 role=role,
@@ -232,13 +246,11 @@ class Provider(LXBSession):
         url = self.server
 
         if role is None:
-            # TODO change naming of TARGET_RESOURCE and ARTEFACT_RESOURCE as `role`
-            #  not None does not mean that the document is a target or an artefact
-            url += ServiceUrl.TARGET_RESOURCE.format(
+            url += ServiceUrl.DOCUMENT_RESOURCE.format(
                 provider=self.urn, task=task_slug, resource=DownloadResource.PAGE
             )
         else:
-            url += ServiceUrl.ARTEFACT_RESOURCE.format(
+            url += ServiceUrl.ROLE_RESOURCE.format(
                 provider=self.urn,
                 task=task_slug,
                 role=role,
@@ -273,14 +285,14 @@ class Provider(LXBSession):
         url = self.server
 
         if role is None:
-            url += ServiceUrl.TARGET_PROJECTION.format(
+            url += ServiceUrl.DOCUMENT_PROJECTION.format(
                 provider=self.urn,
                 task=task_slug,
                 pkey=pkey,
                 resource=DownloadResource.PROJECTION,
             )
         else:
-            url += ServiceUrl.ARTEFACT_PROJECTION.format(
+            url += ServiceUrl.ROLE_PROJECTION.format(
                 provider=self.urn,
                 task=task_slug,
                 role=role,

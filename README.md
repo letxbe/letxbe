@@ -16,9 +16,10 @@ To install the package run `pip install git+https://github.com/letxbe/letxbe.git
 
 ### Developers
 
-Developers should clone the repository via `git clone` and then install the developers
+Developers should clone the repository via `git clone` and then install the developer
 requirements via `pip install -r requirements-dev.txt`.
 
+Include authentication parameters in `.env` file in order to run integration tests, including `CLIENT_ID` and `CLIENT_SECRET`.
 
 # Basic usage
 
