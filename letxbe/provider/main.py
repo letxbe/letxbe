@@ -189,8 +189,6 @@ class Provider(LXBSession):
             headers=self.authorization_header,
         )
 
-        self._verify_response_is_success(res)
-
         fname = extract_filename_from_response_header(res)
 
         return fname, cast(bytes, res.content)
@@ -226,8 +224,6 @@ class Provider(LXBSession):
             url=url,
             headers=self.authorization_header,
         )
-
-        self._verify_response_is_success(res)
 
         zipped = bytes_to_zipfile(res.content)
         return zipfile_to_byte_files(zipped)
