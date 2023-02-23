@@ -1,8 +1,9 @@
 from typing import List, Union
 
+from letxbe.type import Prediction
+
 from .enum import DownloadResource, LogStatus, ServiceUrl
 from .page import Page
-from .prediction import Feedback, LabelFeedback, LabelPrediction, Prediction
 from .projection import ProjectionRoot
 from .task import Task
 
@@ -19,9 +20,5 @@ __all__ = [
     "LogStatus",
     "ProjectionRoot",
     "Page",
-    "Prediction",
-    "Feedback",
-    "LabelPrediction",
-    "LabelFeedback",
     "SaverArgType",
 ]

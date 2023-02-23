@@ -151,7 +151,7 @@ class PredictionResultType(BaseModel):
     __root__: Dict[
         str,
         Union[
-            PredictionValueType, List["PredictionResultType"], "PredictionResultType"
+            List["PredictionResultType"], "PredictionResultType", PredictionValueType
         ],
     ] = {}
 
