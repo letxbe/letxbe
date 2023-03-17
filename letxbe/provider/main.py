@@ -118,16 +118,34 @@ class Provider(LXBSession):
         else:
             tuppled_data = (data,)
 
+        content_header = {"Content-Type": "application/json"}
+        if len(tuppled_data) > 1 and any(
+            isinstance(element, bytes) for element in tuppled_data
+        ):
+            raise NotImplementedError
+
         for vec in tuppled_data:
+            if isinstance(vec, bytes):
+                content_header = {"Content-Type": "application/octet-stream"}
+                self._send_request(vec, task_slug, content_header)
+                return
             if isinstance(vec, list):
                 to_save += [[pydantic_model_to_json(element) for element in vec]]
                 continue
             to_save += [pydantic_model_to_json(vec)]
+        self._send_request(to_save, task_slug, content_header)
+        return
 
+    def _send_request(
+        self,
+        to_save: Union[bytes, List[Union[Dict, List[Dict]]]],
+        task_slug: str,
+        content_header: Dict[str, str],
+    ) -> None:
         res = requests.post(
             url=self.server + ServiceUrl.SAVE.format(provider=self.urn, task=task_slug),
             json=to_save,
-            headers=self.authorization_header,
+            headers={**self.authorization_header, **content_header},
         )
 
         self._verify_response_is_success(res)

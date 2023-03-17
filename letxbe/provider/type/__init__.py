@@ -7,11 +7,7 @@ from .page import Page
 from .projection import ProjectionRoot
 from .task import Task
 
-SaverArgType = Union[
-    List[Page],
-    List[ProjectionRoot],
-    Prediction,
-]
+SaverArgType = Union[List[Page], List[ProjectionRoot], Prediction, bytes]
 
 __all__ = [
     "ServiceUrl",

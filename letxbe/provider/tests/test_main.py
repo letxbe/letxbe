@@ -57,3 +57,13 @@ def test_authorization_header(mock_provider, mock_access_token):
         mock_provider.authorization_header["Authorization"]
         == "Bearer " + mock_access_token
     )
+
+
+def test_save__raise_error_if_bytes(mock_provider):
+    # Given
+    mock_input = (b"", b"")
+    mock_slug = Mock()
+
+    # Then
+    with pytest.raises(NotImplementedError):
+        mock_provider.save_and_finish(task_slug=mock_slug, data=mock_input)
