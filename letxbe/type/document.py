@@ -50,6 +50,7 @@ class MetadataMixin(BaseModel):
     client_env: ClientEnv = ClientEnv.TEST
     name: Optional[str] = None
     form: Form = Form()
+    extension: str = ""
 
 
 class ParentDocument(BaseModel):
@@ -102,3 +103,4 @@ class DocumentMixin(CreatedMixin, SlugMixin, MetadataMixin):
     """
 
     name: str
+    urn: str

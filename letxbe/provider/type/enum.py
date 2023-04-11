@@ -9,6 +9,12 @@ class DownloadResource(str, Enum):
     SERVICE_FILE = "service_file"
 
 
+class UploadResource(str, Enum):
+    PAGE = "page"
+    IMAGE = "image"
+    SERVICE_FILE = "service_file"
+
+
 class ServiceUrl(str, Enum):
     TASKS = "/api/provider/{provider:s}/task"
     SAVE = "/api/provider/{provider:s}/task/{task:s}/save"

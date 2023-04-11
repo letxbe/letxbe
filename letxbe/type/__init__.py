@@ -20,4 +20,5 @@ __all__ = [
     "Metadata",
     "Target",
     "ParentDocument",
+    "Document",
 ]

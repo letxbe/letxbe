@@ -1,6 +1,8 @@
-from typing import Dict, List, Optional, Tuple, Union, cast
+import json
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import requests
+from PIL.Image import Image
 
 from letxbe.exception import AutomationError
 from letxbe.provider.type import (
@@ -11,12 +13,16 @@ from letxbe.provider.type import (
     SaverArgType,
     ServiceUrl,
     Task,
+    UploadResource,
 )
+from letxbe.provider.type.page import ImageFormat
 from letxbe.session import LXBSession
 from letxbe.utils import (
     bytes_to_zipfile,
     extract_filename_from_response_header,
+    pil_image_to_bytes,
     pydantic_model_to_json,
+    zip_files,
     zipfile_to_byte_files,
 )
 
@@ -76,7 +82,7 @@ class Provider(LXBSession):
     def save_and_finish(
         self,
         task_slug: str,
-        data: Union[SaverArgType, Tuple[SaverArgType]],
+        data: Optional[Union[SaverArgType, Tuple[SaverArgType]]],
         status_code: LogStatus = LogStatus.SUCCESS,
         text: str = "",
         exception: str = "",
@@ -97,8 +103,8 @@ class Provider(LXBSession):
         Returns:
             Text of the HTTP response.
         """
-
-        self._save(task_slug, data)
+        if data is not None:
+            self._save(task_slug, data)
 
         self._finish(
             task_slug=task_slug, status_code=status_code, text=text, exception=exception
@@ -170,9 +176,54 @@ class Provider(LXBSession):
         self._verify_response_is_success(res)
         return
 
+    def properties(self, task_slug: str) -> Dict[str, Any]:
+        res = requests.get(
+            url=self.server
+            + ServiceUrl.DOCUMENT.format(provider=self.urn, task=task_slug),
+            headers=self.authorization_header,
+        )
+
+        return cast(dict, res.json())
+
+    def upload_images(
+        self, task_slug: str, images: List[Image], image_fmt: ImageFormat
+    ) -> None:
+        tupled_images = [
+            (f"{task_slug}_{k}", pil_image_to_bytes(image))
+            for k, image in enumerate(images)
+        ]
+        zipped_images = zip_files(tupled_images)
+        files = {"file": zipped_images}
+        res = requests.post(
+            url=self.server
+            + ServiceUrl.DOCUMENT_RESOURCE.format(
+                provider=self.urn, task=task_slug, resource=UploadResource.IMAGE
+            ),
+            headers=self.authorization_header,
+            files=files,
+            params={"format": image_fmt},
+        )
+
+        self._verify_response_is_success(res)
+        return
+
+    def upload_pages(self, task_slug: str, pages: List[Page]) -> None:
+        json_pages = [pydantic_model_to_json(page) for page in pages]
+        res = requests.post(
+            url=self.server
+            + ServiceUrl.DOCUMENT_RESOURCE.format(
+                provider=self.urn, task=task_slug, resource=UploadResource.PAGE
+            ),
+            headers=self.authorization_header,
+            data=json.dumps({"pages": json_pages}),
+        )
+
+        self._verify_response_is_success(res)
+        return
+
     def download_document_file(
         self, task_slug: str, role: Optional[str] = None
-    ) -> Tuple[str, bytes]:
+    ) -> Tuple[Optional[str], bytes]:
         """
         Download the Document file associated to the task.
 
@@ -207,9 +258,11 @@ class Provider(LXBSession):
             headers=self.authorization_header,
         )
 
-        fname = extract_filename_from_response_header(res)
-
-        return fname, cast(bytes, res.content)
+        try:
+            fname = extract_filename_from_response_header(res)
+            return fname, cast(bytes, res.content)
+        except (ValueError, KeyError, IndexError):
+            return None, cast(bytes, res.content)
 
     def download_images(
         self, task_slug: str, role: Optional[str] = None

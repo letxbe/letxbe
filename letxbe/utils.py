@@ -1,11 +1,20 @@
 import io
 import json
 import re
-from typing import List, Tuple, cast
+from typing import List, Sequence, Tuple, Union, cast
 from zipfile import ZipFile, is_zipfile
 
 import requests
+from PIL.Image import Image
 from pydantic import BaseModel
+
+
+def pil_image_to_bytes(image: Image) -> bytes:
+    # https://stackoverflow.com/a/33117447
+    imgByteIO = io.BytesIO()
+    image.save(imgByteIO, format=image.format)
+
+    return cast(bytes, imgByteIO.getvalue())
 
 
 def extract_filename_from_response_header(res: requests.Response) -> str:
@@ -34,6 +43,30 @@ def pydantic_model_to_json(model: BaseModel) -> dict:
         Dictionary representation of a model.
     """
     return cast(dict, json.loads(model.json()))
+
+
+def pydantic_model_to_bytes(model: Union[BaseModel, Sequence[BaseModel]]) -> bytes:
+    """
+    Convert any pydantic model (or list of models) to bytes.
+
+    Usage examples:
+        - the Page list to be uploaded to the bucket via boto_sdk
+
+    Args:
+        model (Union[BaseModel, List[BaseModel]): Pydantic model to convert or list
+            of models.
+
+    Returns:
+        bytes representation of the model
+    """
+    if isinstance(model, list):
+        serializable_file: Union[list, dict] = [mod.dict() for mod in model]
+    elif isinstance(model, BaseModel):
+        serializable_file = model.dict()
+    else:
+        raise TypeError("Input must be a pydantic model or a list of pydantic models")
+
+    return json.dumps(serializable_file).encode("utf-8")
 
 
 def bytes_to_zipfile(
@@ -65,3 +98,16 @@ def zipfile_to_byte_files(
         res += [(name, zipped.open(name).read())]
 
     return res
+
+
+def zip_files(
+    tuples_with_filename_and_bytes: List[Tuple[str, bytes]],
+) -> bytes:
+
+    zip_stream = io.BytesIO()
+
+    with ZipFile(zip_stream, "w") as zip_archive:
+        for imported in tuples_with_filename_and_bytes:
+            zip_archive.writestr(*imported)
+
+    return zip_stream.getvalue()
