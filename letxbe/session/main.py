@@ -48,6 +48,7 @@ class LXBSession:
 
     @staticmethod
     def _verify_status_code(res: requests.Response) -> None:
+
         if res.status_code == 403:
             raise AuthorizationError(res.reason)
 

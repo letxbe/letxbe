@@ -137,7 +137,7 @@ class LXB(LXBSession):
             + Url.POST_PREDICTION.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
-            json=prediction.dict(),
+            data=json.dumps(prediction.dict()),
             headers=self.authorization_header,
         )
 
@@ -167,7 +167,7 @@ class LXB(LXBSession):
             + Url.POST_FEEDBACK.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
-            json=feedback.dict(),
+            data=json.dumps(feedback.dict()),
             headers=self.authorization_header,
         )
 
