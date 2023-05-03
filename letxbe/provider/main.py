@@ -186,10 +186,24 @@ class Provider(LXBSession):
         return cast(dict, res.json())
 
     def upload_images(
-        self, task_slug: str, images: List[Image], image_fmt: ImageFormat
+        self,
+        task_slug: str,
+        images: List[Image],
+        image_fmt: ImageFormat,
+        batch: int = 0,
     ) -> None:
+        """
+        Upload images to S3.
+
+        Args:
+            task_slug (str): Slug of the task being treated.
+            images (List[Images]): Images to upload.
+            image_fmt (ImageFormat): Format of the images.
+            batch (int, default 0): If uploading images by batches, indicate the value
+                of batch to avoid overwriting images.
+        """
         tupled_images = [
-            (f"{task_slug}_{k}", pil_image_to_bytes(image))
+            (f"{task_slug}_{k + batch}", pil_image_to_bytes(image))
             for k, image in enumerate(images)
         ]
         zipped_images = zip_files(tupled_images)
