@@ -215,7 +215,7 @@ class Provider(LXBSession):
             ),
             headers=self.authorization_header,
             files=files,
-            params={"format": image_fmt},
+            params={"format": image_fmt, "offset": batch},  # type: ignore[arg-type]
         )
 
         self._verify_response_is_success(res)
