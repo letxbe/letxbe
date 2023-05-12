@@ -3,7 +3,7 @@ from typing import Any, Union
 
 from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr, validator
 
-ValueType = Union[StrictInt, StrictBool, StrictFloat, StrictStr]
+ValueType = Union[StrictInt, StrictBool, StrictFloat, StrictStr, None]
 
 
 def assert_type_and_value_equality(value_1: ValueType, value_2: ValueType) -> None:
