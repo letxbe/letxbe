@@ -1,5 +1,5 @@
 import pytest
-from pydantic import parse_obj_as
+from pydantic import ValidationError, parse_obj_as
 
 from letxbe.type.base import CreatedMixin, ValueType, assert_type_and_value_equality
 
@@ -24,9 +24,9 @@ def test_ValueType__parse_is_str(value):
     assert type(parse_obj_as(ValueType, value)).__name__ == "str"
 
 
-@pytest.mark.parametrize("value", [None])
-def test_ValueType__parse_is_None(value):
-    assert type(parse_obj_as(ValueType, value)).__name__ == "NoneType"
+def test_ValueType__None_not_accepted():
+    with pytest.raises(ValidationError):
+        parse_obj_as(ValueType, None)
 
 
 @pytest.mark.parametrize(
