@@ -62,6 +62,11 @@ class ProjectionClue(ClueMixin):
 ClueType = Union[PageClue, ProjectionClue]
 
 
+class ChildConnection(BaseModel):
+    atms_slug: str
+    doc_slug: str
+
+
 class Label(BaseModel):
     """
     Information produced about a `Target` and its connected `Artefact` documents,
@@ -76,6 +81,7 @@ class Label(BaseModel):
     lid: str = Field(default_factory=lambda: str(uuid.uuid4()))
     value: Optional[ValueType]
     clues: List[ClueType] = []
+    children: Optional[List[ChildConnection]] = None
 
     class Config:
         smart_union = True
@@ -101,11 +107,6 @@ class LabelFeedback(Label):
     vote: FeedbackVote = FeedbackVote.VALID
 
 
-class ChildConnection(BaseModel):
-    atms_slug: str
-    doc_slug: str
-
-
 class LabelPrediction(Label):
     """
     Minimal data structure used in `Prediction`, containing a single prediction.
@@ -121,7 +122,6 @@ class LabelPrediction(Label):
 
     score: Optional[float] = Field(None, ge=0, le=100)
     model_version: Optional[str] = None
-    children: Optional[List[ChildConnection]] = None
 
 
 CurrentValueType = Union[List[Label], Label]
@@ -129,7 +129,14 @@ CurrentValueType = Union[List[Label], Label]
 
 class CurrentResultType(BaseModel):
     __root__: Dict[
-        str, Union[CurrentValueType, List["CurrentResultType"], "CurrentResultType"]
+        str,
+        Union[
+            List["CurrentResultType"],
+            "CurrentResultType",
+            List[List[CurrentValueType]],
+            List[CurrentValueType],
+            CurrentValueType,
+        ],
     ] = {}
 
 
@@ -151,7 +158,11 @@ class PredictionResultType(BaseModel):
     __root__: Dict[
         str,
         Union[
-            List["PredictionResultType"], "PredictionResultType", PredictionValueType
+            List["PredictionResultType"],
+            "PredictionResultType",
+            List[List[PredictionValueType]],
+            List[PredictionValueType],
+            PredictionValueType,
         ],
     ] = {}
 
@@ -188,7 +199,14 @@ FeedbackValueType = Union[List[LabelFeedback], LabelFeedback]
 
 class FeedbackResultType(BaseModel):
     __root__: Dict[
-        str, Union[FeedbackValueType, List["FeedbackResultType"], "FeedbackResultType"]
+        str,
+        Union[
+            List["FeedbackResultType"],
+            "FeedbackResultType",
+            List[List[FeedbackValueType]],
+            List[FeedbackValueType],
+            FeedbackValueType,
+        ],
     ] = {}
 
 
