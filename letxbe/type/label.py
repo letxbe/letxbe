@@ -5,13 +5,13 @@ from pydantic import BaseModel, Field
 
 from .base import ValueType
 from .enum import FeedbackVote
+from .image import BBox
 
 FEEDBACK_M2M_IDENTIFIER = "M2M"
 
 
 class ClueMixin(BaseModel):
-    """
-    Define shared information between all clue formats.
+    """Define shared information between all clue formats.
 
     Args:
         role (str, None): Role of the Artefact that contains the source.
@@ -19,12 +19,22 @@ class ClueMixin(BaseModel):
             the prediction or feedback where the Clue is saved.
     """
 
+    value: Optional[str]
     role: Optional[str]
 
 
-class PageClue(ClueMixin):
+class BBoxMixin(BaseModel):
+    """Normalized coordinates of a bounding box in an image.
+
+    Args:
+        bbox: see type.image.BBox
     """
-    Point to a page in a document.
+
+    bbox: BBox
+
+
+class PageClue(ClueMixin):
+    """Point to a page in a document.
 
     Args:
         page_idx: Page index of a page in an original document.
@@ -35,6 +45,32 @@ class PageClue(ClueMixin):
     """
 
     page_idx: int
+
+
+class WordClue(PageClue):
+    """Coordinates of a word in a `Page` object.
+
+    Args:
+        line_idx (int): line index
+        word_idx (int): word index
+    """
+
+    line_idx: int
+    word_idx: int
+    bbox: Optional[BBox] = None
+
+
+class BBoxInPageClue(PageClue, BBoxMixin):
+    """Point to a bounding box in a page of a document.
+
+    Args:
+        page_idx: Page index of a page in an original document.
+        bbox: bounding box in the corresponding image, see type.image.BBox
+
+    Remarks:
+        if a document is a split version of an original one, page_idx is the page index
+            of the page in the original document.
+    """
 
 
 class ProjectionClue(ClueMixin):
@@ -57,9 +93,11 @@ class ProjectionClue(ClueMixin):
     pkey: str
     xid: str
     projection_entry: str
+    token_idx: Optional[int] = 0
+    length: Optional[int] = 0
 
 
-ClueType = Union[PageClue, ProjectionClue]
+ClueType = Union[BBoxInPageClue, WordClue, PageClue, ProjectionClue]
 
 
 class ChildConnection(BaseModel):
