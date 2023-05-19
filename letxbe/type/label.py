@@ -19,7 +19,7 @@ class ClueMixin(BaseModel):
             the prediction or feedback where the Clue is saved.
     """
 
-    value: Optional[str]
+    value: str = ""
     role: Optional[str]
 
 
@@ -97,7 +97,7 @@ class ProjectionClue(ClueMixin):
     length: Optional[int] = 0
 
 
-ClueType = Union[BBoxInPageClue, WordClue, PageClue, ProjectionClue]
+ClueType = Union[ProjectionClue, BBoxInPageClue, WordClue, PageClue]
 
 
 class ChildConnection(BaseModel):
