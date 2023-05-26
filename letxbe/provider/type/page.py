@@ -3,7 +3,7 @@ Core typing classes describing text spatially structured.
 
 Examples:
      a pdf parsed into a list of `Page`
-     the screenshot of web-page parsed into a list of `Lines´
+     the screenshot of web-page parsed into a list of `Lines`
 """
 from enum import Enum
 from typing import List, Optional

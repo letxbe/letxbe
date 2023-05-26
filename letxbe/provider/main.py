@@ -40,6 +40,14 @@ class Provider(LXBSession):
         provider_urn: str,
         server_address: Optional[str] = None,
     ) -> None:
+        """
+        Args:
+            Args:
+            client_id (str): Auth0 client ID.
+            client_secret (str): Auth0 client secret.
+            provider_urn (str):
+            server_address (str): Address of the server.
+        """
         super(Provider, self).__init__(
             client_id=client_id,
             client_secret=client_secret,
@@ -49,9 +57,17 @@ class Provider(LXBSession):
 
     @property
     def urn(self) -> str:
+        """URN of the provider"""
         return self.__urn
 
     def _verify_response_is_success(self, res: requests.Response) -> None:
+        """
+        Args:
+            res (requests.Response):
+
+        Raises:
+            AutomationError: If the server is facing a internal error (500 Internal Server Error).
+        """
         self._verify_status_code(res)
 
         if "success" not in res.json():
@@ -61,8 +77,7 @@ class Provider(LXBSession):
     def take_charge(
         self,
     ) -> Optional[Task]:
-        """
-        Take charge for the next task to be executed by the service provider.
+        """Take charge for the next task to be executed by the service provider.
 
         Returns:
             A Task object.
@@ -87,11 +102,7 @@ class Provider(LXBSession):
         text: str = "",
         exception: str = "",
     ) -> None:
-        """
-        Save data coming from a task and end the task to be executed by service.
-
-        Remarks:
-            Multiple saves can be made before finishing.
+        """Save data coming from a task and end the task to be executed by service.
 
         Args:
             task_slug (str): the task slug
@@ -102,6 +113,9 @@ class Provider(LXBSession):
 
         Returns:
             Text of the HTTP response.
+
+        Remarks:
+            Multiple saves can be made before finishing.
         """
         if data is not None:
             self._save(task_slug, data)
@@ -116,6 +130,11 @@ class Provider(LXBSession):
         task_slug: str,
         data: Union[SaverArgType, Tuple[SaverArgType]],
     ) -> None:
+        """
+        Args:
+            task_slug (str):
+            data (Union[SaverArgType, Tuple[SaverArgType]]):
+        """
 
         to_save: List[Union[Dict, List[Dict]]] = []
 
@@ -148,6 +167,12 @@ class Provider(LXBSession):
         task_slug: str,
         content_header: Dict[str, str],
     ) -> None:
+        """
+        Args:
+            to_save (Union[bytes, List[Union[Dict, List[Dict]]]]):
+            task_slug (str):
+            content_header (Dict[str, str]):
+        """
         res = requests.post(
             url=self.server + ServiceUrl.SAVE.format(provider=self.urn, task=task_slug),
             json=to_save,
@@ -160,6 +185,13 @@ class Provider(LXBSession):
     def _finish(
         self, task_slug: str, status_code: LogStatus, text: str, exception: str
     ) -> None:
+        """
+        Args:
+            task_slug (str):
+            status_code (LogStatus):
+            text (str):
+            exception (str):
+        """
         data = {
             "status_code": status_code.value,
             "text": text,
@@ -177,6 +209,13 @@ class Provider(LXBSession):
         return
 
     def properties(self, task_slug: str) -> Dict[str, Any]:
+        """
+        Args:
+            task_slug (str):
+
+        Returns:
+            Dict[str, Any]:
+        """
         res = requests.get(
             url=self.server
             + ServiceUrl.DOCUMENT.format(provider=self.urn, task=task_slug),
@@ -222,6 +261,11 @@ class Provider(LXBSession):
         return
 
     def upload_pages(self, task_slug: str, pages: List[Page]) -> None:
+        """
+        Args:
+            task_slug (str):
+            pages (List[Page]):
+        """
         json_pages = [pydantic_model_to_json(page) for page in pages]
         res = requests.post(
             url=self.server
@@ -238,8 +282,7 @@ class Provider(LXBSession):
     def download_document_file(
         self, task_slug: str, role: Optional[str] = None
     ) -> Tuple[Optional[str], bytes]:
-        """
-        Download the Document file associated to the task.
+        """Download the Document file associated to the task.
 
         By default, the document concerned by the task is downloaded. If `role` is
         not None, then the document attached to the task via `role` is downloaded.
@@ -281,14 +324,14 @@ class Provider(LXBSession):
     def download_images(
         self, task_slug: str, role: Optional[str] = None
     ) -> List[Tuple[str, bytes]]:
-        """
-        Download `Page` object images that can be used to complete the task.
+        """Download `Page` object images that can be used to complete the task.
 
         Returns:
             A list of tuples containing an image filename and bytes.
 
-        # TODO include a list of `page_idx` values as an optional argument
-          to filter images
+        Todo:
+            Iinclude a list of `page_idx` values as an optional argument
+            to filter images
         """
 
         url = self.server
@@ -314,14 +357,13 @@ class Provider(LXBSession):
         return zipfile_to_byte_files(zipped)
 
     def download_pages(self, task_slug: str, role: Optional[str] = None) -> List[Page]:
-        """
-        Download `Page` objects associated to a Document.
+        """Download `Page` objects associated to a Document.
 
         Returns:
             A list of `Page` objects.
 
-        # TODO include a list of `page_idx` values as an optional argument
-          to filter pages
+        Todo: include a list of `page_idx` values as an optional argument
+            to filter pages
         """
 
         url = self.server
@@ -352,15 +394,14 @@ class Provider(LXBSession):
     def download_projections(
         self, task_slug: str, pkey: str, role: Optional[str] = None
     ) -> List[ProjectionRoot]:
-        """
-        Download `ProjectionRoot` objects associated to a Document
-          for a given projection key.
+        """Download `ProjectionRoot` objects associated to a Document
+        for a given projection key.
 
         Returns:
             A list of `ProjectionRoot` objects.
 
-        # TODO include a list of `xid` values as an optional argument
-          to filter projections
+        Todo: include a list of `xid` values as an optional argument
+            to filter projections
         """
 
         url = self.server

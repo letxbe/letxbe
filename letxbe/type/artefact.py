@@ -12,43 +12,47 @@ from .document import DocumentMixin, StatusMixin, WithParentMixin
 
 
 class ArtefactMixin(BaseModel):
-    """
-    Information specific to an `Artefact`.
+    """Information specific to an `Artefact`.
+
+    Attributes:
+        role (str): Should identify what the artefact is used for.
     """
 
     role: str = Field(..., min_length=1)
 
 
 class ArtefactToConnect(SlugMixin):
-    """
-    Information that is enough to connect an `Artefact` to other documents when uploading them.
-    """
+    """Information that is enough to connect an `Artefact` to other documents when uploading them.
+    Essentially a `SlugMixin` referencing an `Document` of specific type `Artefact`."""
 
 
 class WithArtefactsMixin(BaseModel):
-    """
-    Capacity to connect a document to a series of artefacts when uploading it.
+    """Capacity to connect a document to a series of artefacts when uploading it.
 
     Keys in `WithArtefactsMixin.artefact` are defined in the `Automatisme` configuration.
+
+    Attributes:
+        artefact (Dict[str, ArtefactToConnect]):
     """
 
     artefact: Dict[str, ArtefactToConnect] = {}
 
 
 class ConnectedArtefact(DocumentMixin, ArtefactMixin, WithParentMixin, StatusMixin):
-    """
-    Information about an `Artefact` that is available when accessing another `Document`
-    the `Artefact` is connected to.
-    """
+    """Information about an `Artefact` that is available when accessing another `Document`
+    the `Artefact` is connected to."""
 
 
 class ArtefactConnectionMixin(BaseModel):
-    """
-    Capacity for a document to provide information about connected `Artefact` documents.
+    """Capacity for a document to provide information about connected `Artefact` documents.
 
     Keys in `ArtefactConnectionMixin.artefact` are defined in the `Automatisme` configuration.
 
-    # TODO : add a validator to ensure role in Dict is equal to ConnectedArtefact.role
+    Attributes:
+        artefact (Dict[str, ConnectedArtefact]):
+
+    Todo:
+        Add a validator to ensure role in Dict is equal to ConnectedArtefact.role
     """
 
     artefact: Dict[str, ConnectedArtefact] = {}
@@ -57,6 +61,4 @@ class ArtefactConnectionMixin(BaseModel):
 class Artefact(
     DocumentMixin, ArtefactMixin, WithParentMixin, StatusMixin, ArtefactConnectionMixin
 ):
-    """
-    Information about an `Artefact` that is available when accessing it directly.
-    """
+    """Information about an `Artefact` that is available when accessing it directly."""

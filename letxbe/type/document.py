@@ -9,6 +9,12 @@ FormValueType = Union[List[ValueType], ValueType]
 
 
 class FormResultType(BaseModel):
+    """Dict-like object with:
+
+    - keys with string format
+    - values with `FormValueType` format
+    """
+
     __root__: Dict[str, Optional[Union[FormValueType, "FormResultType"]]] = {}
 
 
@@ -16,35 +22,42 @@ FormResultType.update_forward_refs()
 
 
 class Form(BaseModel):
-    """
-    Contains information available about a `Document` when uploading it.
+    """Contains information available about a `Document` when uploading it.
+
+    Args:
+        result (FormResultType):
 
     Remarks:
-        can be used in multiple scenarii:
+      - Can be used in multiple scenarii:
           - specifying options for an AI Model
           - attaching an `Artefact` after uploading a `Target`,
             in that case, `Target` is not processed until a matching artefact is found.
-        in some cases, a file may not be attached to a `Document` as the `Form`
-          holds complete information about it.
+      - In some cases, a file may not be attached to a `Document` as the `Form`
+        holds complete information about it.
     """
 
     result: FormResultType = FormResultType()
 
 
 class MetadataMixin(BaseModel):
-    """
-    Information shared about a document when uploading it.
+    """Information shared about a document when uploading it.
 
-    client_env: Environment the document should be sent to (test, prod)
-    extension: Extension of the file, eg "xlsx", "pdf",...
-      should be "" when no file is shared with the document.
-    name: Name to give the document, if you want to override a file's name
-      this property should not end with an extension
-      this property can be edited after a `Prediction` or `Feedback` is made.
-    form: a Form object
+    Args:
+        client_env (ClientEnv): Environment the document should be sent to (test, prod)
 
-    # TODO : ensure name doesn't end with an extension when uploading a file,
-        or weird behaviors will appear when trying to download it later
+        extension (str): Extension of the file, eg "xlsx", "pdf",... Should be "" when no file
+        is shared with the document.
+
+        name (str, optional): Name to give the document, if you want to override a file's name.
+
+              - This property should not end with an extension.
+              - This property can be edited after a `Prediction` or `Feedback` is made.
+
+        form (Form): A Form object containing information available about the document when uploading it.
+
+    Todo:
+        Ensure name doesn't end with an extension when uploading a file,
+        or weird behaviors will appear when trying to download it later.
     """
 
     client_env: ClientEnv = ClientEnv.TEST
@@ -54,19 +67,24 @@ class MetadataMixin(BaseModel):
 
 
 class ParentDocument(BaseModel):
-    """
-    Define a relationship with a parent `Document` (`Parent`).
-
+    """Define a relationship with a parent `Document` (`Parent`).
     Used when a `Child` document is an extract of a `Parent`.
 
-    atms_slug: Slug of the Automatisme of the `Parent`.
-    doc_slug: Slug of the `Parent`.
-    content: a filter that lists `page_idx` values from Parent.content `Page` objects that should be kept in Child.content.
-        If no `Page` objects should be transferred, use []
-        If all `Page` objects should be transferred, use None
-    projection: a filter that lists `xid` values from Parent.projection[...] `ProjectionRoot` objects that should be kept in Child.projection
-        If no `ProjectionRoot` objects should be transferred, use [] or do not cite `pkey` in `Parent.projection`
-        If all `ProjectionRoot` objects should be transferred, use None
+    Attributes:
+        atms_slug (str): Slug of the Automatisme of the `Parent`.
+
+        doc_slug: Slug of the `Parent`.
+
+        content: A filter that lists `page_idx` values from Parent.content `Page` objects that should be kept in Child.content.
+
+          - If no `Page` objects should be transferred, use []
+          - If all `Page` objects should be transferred, use None
+
+        projection: a filter that lists `xid` values from Parent.projection[...] `ProjectionRoot` objects that should be kept in Child.projection
+
+          - keys are `pkey` or `ProjectionClue`
+          - If no `ProjectionRoot` objects should be transferred, use [] or do not cite `pkey` in `Parent.projection`
+          - If all `ProjectionRoot` objects should be transferred, use None
     """
 
     atms_slug: str
@@ -76,20 +94,22 @@ class ParentDocument(BaseModel):
 
 
 class WithParentMixin(BaseModel):
-    """
-    Ability to be connected to a `ParentDocument`
+    """Ability to be connected to a `ParentDocument`
+
+    Attributes:
+        parent (`ParentDocument` or None):
     """
 
     parent: Optional[ParentDocument] = None
 
 
 class StatusMixin(BaseModel):
-    """
-    Define codes that indicate `Document` processing status.
+    """Define codes that indicate `Document` processing status.
 
-    status_code: indicates pipeline processing status.
-    action_code: characterizes the latest complete step.
-    exception: corresponds to the latest exception met.
+    Attributes:
+        status_code (DocumentStatus): Indicates pipeline processing status.
+        action_code (ActionCode or None): Characterizes the latest complete step.
+        exception (str or None): Corresponds to the latest exception met.
     """
 
     status_code: DocumentStatus = DocumentStatus.PROCESSING
@@ -98,8 +118,11 @@ class StatusMixin(BaseModel):
 
 
 class DocumentMixin(CreatedMixin, SlugMixin, MetadataMixin):
-    """
-    Information generated about a `Document`.
+    """Information generated about a `Document`.
+
+    Attributes:
+        name (str): `Document` name.
+        urn (str): `Document` URN.
     """
 
     name: str

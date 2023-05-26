@@ -12,3 +12,4 @@ requests
 python-dotenv
 pillow==9.3.0
 types-Pillow
+sphinx

@@ -85,3 +85,7 @@ __pypackages__/
 
 # mypy
 .mypy_cache/
+
+# pipfiles
+Pipfile
+Pipfile.lock

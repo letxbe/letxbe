@@ -9,29 +9,38 @@ BASE_URL = "https://prod-unfold.onogone.com"
 
 
 class LXBSession:
-    """
-    Connect to LetXbe and share requests.
-    """
+    """Connection session to LetXbe and share requests."""
 
     def __init__(
         self, client_id: str, client_secret: str, server_address: Optional[str] = None
     ):
+        """
+        Args:
+            client_id (str): Auth0 client ID.
+            client_secret (str): Auth0 client secret.
+            server_address (str, optional): Address of the server.
+                If None or not specified, `BASE_URL` will be used by default.
+        """
         self.__server_address = BASE_URL if server_address is None else server_address
         self.__token = self._connect(client_id, client_secret)
 
     @property
     def server(self) -> str:
+        """Address of the server."""
         return self.__server_address
 
     def _connect(self, client_id: str, client_secret: str) -> str:
-        """
-        Connect with LetXbe.
+        """Connect with LetXbe.
 
         Args:
             client_id (str): Auth0 client ID.
             client_secret (str): Auth0 client secret.
+
+        Returns:
+            str: The `BEARER_CODE` associated to the authentication.
+
         Raises:
-            AuthorizationError: Invalid credentials.
+            AuthorizationError: If the connection to the server is forbidden (403 Forbidden).
         """
         response = requests.post(
             self.__server_address + Url.LOGIN,
@@ -48,6 +57,18 @@ class LXBSession:
 
     @staticmethod
     def _verify_status_code(res: requests.Response) -> None:
+        """Map the status code of the response of the request to a Python
+        exception and raise it (if any).
+
+        Args:
+            res (requests.Reponse): Response of a request.
+
+        Raises:
+            AuthorizationError: If the connection to the server is forbidden (403 Forbidden).
+            UnkownRessourceError: If the requested ressource is not found (404 Not Found).
+            AutomationError: If the server is facing a internal error (500 Internal Server Error).
+            ValueError: If the server returns any other error code.
+        """
 
         if res.status_code == 403:
             raise AuthorizationError(res.reason)
@@ -64,5 +85,6 @@ class LXBSession:
         raise ValueError(f"Request failed with code {res.status_code}: {res.reason}")
 
     @property
-    def authorization_header(self) -> Dict:
+    def authorization_header(self) -> Dict[str, str]:
+        """Header for authenticating API calls. Authentication is done via a Bearer code."""
         return {"Authorization": "Bearer " + self.__token}

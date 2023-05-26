@@ -7,8 +7,11 @@ ValueType = Union[StrictInt, StrictBool, StrictFloat, StrictStr]
 
 
 def assert_type_and_value_equality(value_1: ValueType, value_2: ValueType) -> None:
-    """
-    Assert two values are equal and of the same type if one of them is boolean.
+    """Assert two values are equal and of the same type if one of them is boolean.
+
+    Args:
+        value_1 (ValueType):
+        value_2 (ValueType):
     """
     if (
         isinstance(value_1, bool)
@@ -27,21 +30,26 @@ low_key_regex = re.compile(r"[a-zA-Z\_0-9]+")
 
 
 class SlugMixin(BaseModel):
-    """
-    A resource that can be uniquely identified with a single `slug`.
+    """A resource that can be uniquely identified with a single `slug`.
 
-    slug: unique identifier that can be used in a URL
+    Attributes:
+        slug (str): Unique identifier that can be used in a URL.
     """
 
     slug: str
 
     @validator("slug")
     def enforce_slug_regex_on_slugs(cls: Any, value: str) -> str:
-        """
-        Validate the format of `SlugMixin.slug`.
+        """Validate the format of `SlugMixin.slug`.
+
+        Args:
+            value (str): The value of the slug.
+
+        Returns:
+            str: The value of the slug if supported.
 
         raises:
-            ValueError: the value of the slug is not supported.
+            ValueError: The value of the slug is not supported.
         """
 
         if slug_regex.fullmatch(value) is None:
@@ -52,10 +60,11 @@ class SlugMixin(BaseModel):
 
 
 class CreatedMixin(BaseModel):
-    """
-    A resource that can be created.
+    """A resource that can be created.
 
-    created_at: timestamp in milliseconds corresponding to the creation of the object.
+    Attributes:
+        created_at (int): Timestamp in milliseconds corresponding to the creation of
+            the object. Set to 0 at default.
     """
 
     created_at: int = 0

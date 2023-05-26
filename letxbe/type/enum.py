@@ -2,6 +2,12 @@ from enum import Enum
 
 
 class ClientEnv(str, Enum):
+    """Describe the environment in which a `Document` will be sent:
+
+    - PROD: production environment
+    - TEST: test environment
+    """
+
     PROD = "prod"
     TEST = "test"
 
@@ -10,12 +16,11 @@ class ClientEnv(str, Enum):
 
 
 class ActionCode(str, Enum):
-    """
-    Describe what a step does with a `Document`.
+    """Describe what kind of processing step is applied to a `Document`:
 
-    PROJECTION: generate a representation (update document or projection field)
-    PREDICTION: update prediction
-    REPERCUSSION: apply an action externally
+    - PROJECTION: generate a representation (update document or projection field)
+    - PREDICTION: update prediction
+    - REPERCUSSION: apply an action externally
     """
 
     PROJECTION = "projection"
@@ -27,12 +32,13 @@ class ActionCode(str, Enum):
 
 
 class DocumentStatus(str, Enum):
-    """
-    HOLD: process has been interrupted by the plateform or developer
-    WAITING: some information is missing before process can start
-    PROCESSING: a step is being processing
-    SUCCESS: step needs to be the last and log be `LogStatus.SUCCESS`
-    ERROR: An error was encountered
+    """Describe the status of a `Document` processing step:
+
+    - HOLD: Process has been interrupted by the plateform or developer
+    - WAITING: Some information is missing before process can start
+    - PROCESSING: A step is being processing
+    - SUCCESS: Step needs to be the last and log be `LogStatus.SUCCESS`
+    - ERROR: An error was encountered
     """
 
     HOLD = "101"
@@ -46,6 +52,12 @@ class DocumentStatus(str, Enum):
 
 
 class FeedbackVote(str, Enum):
+    """Describe the value of a `Label` as:
+
+    - VALID:
+    - INVALID:
+    """
+
     VALID = "Valid"
     INVALID = "Invalid"
 
@@ -54,6 +66,15 @@ class FeedbackVote(str, Enum):
 
 
 class Url(str, Enum):
+    """URLs used for requests:
+
+    - LOGIN: Connection to LetXBe. Returns an acces token.
+    - POST_DOCUMENT: Post a document. Returns the document slug.
+    - POST_ARTEFACT: Post an artefact. Returns the dpcument slug.
+    - POST_PREDICTION: Post a prediction on a given document slug.
+    - GET_DOCUMENT: Request a document associated on a given document slug.
+    """
+
     LOGIN = "/api/get_m2m_token"
     POST_DOCUMENT = "/api/automatisme/{automatisme_slug:s}/document"
     POST_ARTEFACT = "/api/automatisme/{automatisme_slug:s}/role/{role:s}/document"

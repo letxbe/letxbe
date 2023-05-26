@@ -10,7 +10,16 @@ from pydantic import BaseModel
 
 
 def pil_image_to_bytes(image: Image) -> bytes:
-    # https://stackoverflow.com/a/33117447
+    """Convert PIL Image into bytes.
+
+    Get from https://stackoverflow.com/a/33117447.
+
+    Args:
+        image (Image): Image to convert.
+
+    Returns:
+        bytes: The converted image.
+    """
     imgByteIO = io.BytesIO()
     image.save(imgByteIO, format=image.format)
 
@@ -18,6 +27,17 @@ def pil_image_to_bytes(image: Image) -> bytes:
 
 
 def extract_filename_from_response_header(res: requests.Response) -> str:
+    """Search and extract the filename from a response header.
+
+    Args:
+        res (requests.Response): The response containing the header.
+
+    Returns:
+        str: The filename if found.
+
+    Raises:
+        ValueError: If the filename is not found.
+    """
     d = res.headers["content-disposition"]
     filename = re.findall("filename=(.+)", d)[0]
 
@@ -28,8 +48,7 @@ def extract_filename_from_response_header(res: requests.Response) -> str:
 
 
 def pydantic_model_to_json(model: BaseModel) -> dict:
-    """
-    Convert any model to a json that can be used as a query parameter for arangodb.
+    """Convert any model to a json that can be used as a query parameter for arangodb.
 
     It is however preferable to create requests that do not take json as a query
     parameter but go explicitly inside the structure.
@@ -46,8 +65,7 @@ def pydantic_model_to_json(model: BaseModel) -> dict:
 
 
 def pydantic_model_to_bytes(model: Union[BaseModel, Sequence[BaseModel]]) -> bytes:
-    """
-    Convert any pydantic model (or list of models) to bytes.
+    """Convert any pydantic model (or list of models) to bytes.
 
     Usage examples:
         - the Page list to be uploaded to the bucket via boto_sdk
@@ -57,7 +75,10 @@ def pydantic_model_to_bytes(model: Union[BaseModel, Sequence[BaseModel]]) -> byt
             of models.
 
     Returns:
-        bytes representation of the model
+        bytes: Representation of the model.
+
+    Raises:
+        TypeError: If the input is not a pydantic model or a list of pydantic models;
     """
     if isinstance(model, list):
         serializable_file: Union[list, dict] = [mod.dict() for mod in model]
@@ -72,8 +93,16 @@ def pydantic_model_to_bytes(model: Union[BaseModel, Sequence[BaseModel]]) -> byt
 def bytes_to_zipfile(
     zipped_bytes: bytes,
 ) -> ZipFile:
-    """
-    Convert bytes to a ZipFile, when compatible.
+    """Convert bytes to a ZipFile, when compatible.
+
+    Args:
+        zipped_bytes (bytes): The bytes to convert.
+
+    Returns:
+        zipfile.ZipFile: The ZipFile corresponding to the bytes.
+
+    Raises:
+        ValueError: If bytes in file do not correspond to a zipped file.
     """
 
     zip_stream = io.BytesIO(zipped_bytes)
@@ -87,8 +116,13 @@ def bytes_to_zipfile(
 def zipfile_to_byte_files(
     zipped: ZipFile,
 ) -> List[Tuple[str, bytes]]:
-    """
-    Convert ZipFile to a list of tuples with filename and bytes.
+    """Extract tuples of filenames and bytes from a ZipFile object.
+
+    Args:
+        zipped (zipfile.ZipFile): The ZipFile object to convert.
+
+    Returns:
+        List[Tuple[str, bytes]]: the filenames and bytes of the converted file.
     """
 
     filenames = zipped.namelist()
@@ -103,6 +137,15 @@ def zipfile_to_byte_files(
 def zip_files(
     tuples_with_filename_and_bytes: List[Tuple[str, bytes]],
 ) -> bytes:
+    """Convert a list of filenames and bytes to bytes that can be read as a ZipFile.
+
+    Args:
+        tuples_with_filename_and_bytes (List[Tuple[str, bytes]]): The list of tuples
+            of filenames and bytes.
+
+    Returns:
+        bytes: The converted bytes.
+    """
 
     zip_stream = io.BytesIO()
 

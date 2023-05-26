@@ -9,7 +9,7 @@ class __ProjectionBase(BaseModel):
     """
     Define base for all elements in Projection.result.
 
-    Related to :
+    Related to:
 
     Projection: Uses `Projection.calculate_projection_entry` to set projection_entry.
 
@@ -24,9 +24,10 @@ class __ProjectionBase(BaseModel):
 
 
 class ProjectionField(__ProjectionBase):
-    """
+    """Field in a `Document`. Associated to a field key in `ProjectionMap`.
+
     Args:
-        value (ValueType): the value of a field
+        value (ValueType): The value of a field.
     """
 
     value: Optional[ValueType]

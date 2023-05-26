@@ -17,9 +17,8 @@ from letxbe.utils import pydantic_model_to_json
 
 
 class LXB(LXBSession):
-    """
-    Connect to LetXbe and share requests.
-    """
+    """Connection session to LetXbe. Provides methods for posting or
+    requesting documents, artefacts, predictions and feedbacks."""
 
     def _post_document(
         self,
@@ -28,8 +27,7 @@ class LXB(LXBSession):
         file: Optional[Tuple[str, bytes]],
         slug: Optional[str] = None,
     ) -> str:
-        """
-        Post a document.
+        """Post a document.
 
         Should only be used directly if you know what you're doing concerning the route.
 
@@ -39,7 +37,7 @@ class LXB(LXBSession):
             file (Tuple[str, bytes], optional): Filename and bytes to post for a File.
 
         Returns:
-            Text of the HTTP response.
+            str: Text of the HTTP response.
         """
         files: Dict[str, Tuple[str, Union[str, bytes]]] = {}
         if file is not None:
@@ -70,8 +68,7 @@ class LXB(LXBSession):
         file: Optional[Tuple[str, bytes]] = None,
         slug: Optional[str] = None,
     ) -> str:
-        """
-        Post a target.
+        """Post a target.
 
         Args:
             automatisme_slug (str): Slug of the automatisme.
@@ -79,7 +76,7 @@ class LXB(LXBSession):
             file (Tuple[str, bytes], optional): Filename and bytes to post as a Target.
 
         Returns:
-            `slug` of the new document.
+            str: Slug of the new document.
         """
         return self._post_document(
             route=self.server
@@ -97,8 +94,7 @@ class LXB(LXBSession):
         file: Optional[Tuple[str, bytes]] = None,
         slug: Optional[str] = None,
     ) -> str:
-        """
-        Post an artefact.
+        """Post an artefact.
 
         Args:
             automatisme_slug (str): Slug of the automatisme.
@@ -107,7 +103,7 @@ class LXB(LXBSession):
             file (Tuple[str, bytes], optional): Filename and bytes to post as an Artefact.
 
         Returns:
-            `slug` of the new document.
+            str: Slug of the new document.
         """
         return self._post_document(
             route=self.server
@@ -123,14 +119,12 @@ class LXB(LXBSession):
         document_slug: str,
         prediction: Prediction,
     ) -> None:
-        """
-        Post a prediction to a given document.
+        """Post a prediction to a given document.
 
         Args:
             automatisme_slug (str): Slug of the automatisme.
             document_slug (str): Slug of the document.
             prediction (Prediction): Contents of the prediction.
-
         """
         response = requests.post(
             url=self.server
@@ -151,8 +145,7 @@ class LXB(LXBSession):
         document_slug: str,
         feedback: Feedback,
     ) -> FeedbackResponse:
-        """
-        Post a feedback to a given document.
+        """Post a feedback to a given document.
 
         Args:
             automatisme_slug (str): Slug of the automatisme.
@@ -160,7 +153,7 @@ class LXB(LXBSession):
             feedback (Feedback): Contents of the feedback.
 
         Returns:
-            FeedbackResponse object containing a list of updated labels.
+            FeedbackResponse: The response containing the updated labels.
         """
         response = requests.post(
             url=self.server
@@ -180,6 +173,16 @@ class LXB(LXBSession):
         automatisme_slug: str,
         document_slug: str,
     ) -> Union[Artefact, Target]:
+        """Get a document or artefact corresponding to a document slug.
+
+        Args:
+            automatisme_slug (str): Slug of the automatisme.
+            document_slug (str): Slug of the document.
+
+        Returns:
+            Union[Artefact, Target]: The document or artefact corresponding to
+            the document slug.
+        """
 
         response = requests.get(
             url=self.server

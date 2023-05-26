@@ -13,7 +13,7 @@ FEEDBACK_M2M_IDENTIFIER = "M2M"
 class ClueMixin(BaseModel):
     """Define shared information between all clue formats.
 
-    Args:
+    Attributes:
         role (str, None): Role of the Artefact that contains the source.
             If 'None', the document is the `Target` that contains
             the prediction or feedback where the Clue is saved.
@@ -26,7 +26,7 @@ class ClueMixin(BaseModel):
 class BBoxMixin(BaseModel):
     """Normalized coordinates of a bounding box in an image.
 
-    Args:
+    Attributes:
         bbox: see type.image.BBox
     """
 
@@ -36,12 +36,12 @@ class BBoxMixin(BaseModel):
 class PageClue(ClueMixin):
     """Point to a page in a document.
 
-    Args:
-        page_idx: Page index of a page in an original document.
+    Attributes:
+        page_idx (int): Page index of a page in an original document.
 
     Remarks:
-        if a document is a split version of an original one, page_idx is the page index
-            of the page in the original document.
+        If a document is a split version of an original one, page_idx is the page index
+        of the page in the original document.
     """
 
     page_idx: int
@@ -77,17 +77,17 @@ class ProjectionClue(ClueMixin):
     """
     Contains information to extract a `ProjectionField` from a Document.
 
-    Args:
-        pkey (str): key pointing to a list of `ProjectionRoot`
+    Attributes:
+        pkey (str): Key pointing to a list of `ProjectionRoot`
         xid (str): xid of the ProjectionRoot
-        projection_entry (str): see `__ProjectionBase.projection_entry`
-        # TODO rename this to `projection_path`
+        projection_entry (str): See `__ProjectionBase.projection_entry`
+            # TODO rename this to `projection_path`
 
     Examples:
-        (without recursive structure) document.projection[pkey]
-            -> filter projection_root_list by `xid`
-            -> output projection_root.result[projection_entry]
-        (with recursive structure) # TODO add example
+      - (without recursive structure) document.projection[pkey]
+          - filter projection_root_list by `xid`
+          - output projection_root.result[projection_entry]
+      - (with recursive structure) # TODO add example
     """
 
     pkey: str
@@ -101,6 +101,12 @@ ClueType = Union[ProjectionClue, BBoxInPageClue, WordClue, PageClue]
 
 
 class ChildConnection(BaseModel):
+    """
+    Attributes:
+        atms_slug (str):
+        doc_slug (str):
+    """
+
     atms_slug: str
     doc_slug: str
 
@@ -109,10 +115,10 @@ class Label(BaseModel):
     """
     Information produced about a `Target` and its connected `Artefact` documents,
 
-    Args:
+    Attributes:
         lid: a unique identifier for the Label
         value: Information on the label.
-          There can be only one Label with the same `value` in a `multiple prediction field`
+            There can be only one Label with the same `value` in a `multiple prediction field`
         clues: List of ClueType objects to explain `value`
     """
 
@@ -127,18 +133,18 @@ class Label(BaseModel):
 
 class LabelFeedback(Label):
     """
-    Args:
+    Attributes:
         source: identifies the source of a `Feedback`.
         vote: defines if `Label.value` should be considered True or False
 
     Remarks:
-        when field holds multiple values (see `Automatisme.prediction_schema`),
-            a value 'Z' can be invalidated by sharing a `LabelFeedback`
-            with `LabelFeedback.vote` == FeedbackVote.VALID and `LabelFeedback.value`
-            is 'Z'
-        when a field holds a single value, it can be invalidated by simply sharing a new
-            value or by invalidating it
-        when a value is invalidated, it does not appear in `Target.current`
+        - When field holds multiple values (see `Automatisme.prediction_schema`),
+          a value 'Z' can be invalidated by sharing a `LabelFeedback`
+          with `LabelFeedback.vote` == FeedbackVote.VALID and `LabelFeedback.value`
+          is 'Z'.
+        - When a field holds a single value, it can be invalidated by simply sharing a new
+          value or by invalidating it when a value is invalidated, it does not appear
+          in `Target.current`.
     """
 
     source: Optional[str] = FEEDBACK_M2M_IDENTIFIER
@@ -151,7 +157,7 @@ class LabelPrediction(Label):
 
     `Prediction.result[key]` is either a `LabelPrediction` or a list of `LabelPrediction`.
 
-    Args:
+    Attributes:
         score (float, None): score of the prediction between 0 and 100
         model_version (str, None): version of the model used for the prediction
         children (Optional[str]): points to documents resulting of a split of the
@@ -183,7 +189,10 @@ CurrentResultType.update_forward_refs()
 
 class Current(BaseModel):
     """
-    Define the current value of a target list of labels based on Prediction and Feedback
+    Define the current value of a target list of labels based on Prediction and Feedback.
+
+    Attributes:
+        result (CurrentResultType):
     """
 
     result: CurrentResultType = CurrentResultType()
@@ -212,7 +221,7 @@ class Prediction(BaseModel):
     """
     Output typing related to AI-models predictions.
 
-    Args:
+    Attributes:
         model_version (str, None): version of the model
         score (float, None): overall prediction score (from 0 to 100)
         comment (str): comment related to prediction
@@ -220,10 +229,10 @@ class Prediction(BaseModel):
             `LabelPrediction`.
 
     Remarks:
-        the keys in result must match the `PredictionSchema` in the Automatisme
-            config, see `request.document.prediction_post_prediction`
-        if the key in result does not match the keys in `PredictionSchema` no
-            error is raised
+      - The keys in result must match the `PredictionSchema` in the Automatisme
+        config, see `request.document.prediction_post_prediction`.
+      - If the key in result does not match the keys in `PredictionSchema` no
+        error is raised.
     """
 
     model_version: Optional[str] = None
@@ -254,6 +263,10 @@ FeedbackResultType.update_forward_refs()
 class Feedback(BaseModel):
     """
     Contain aggregated confirmations, deletions or modifications for a `Prediction` values.
+
+    Attributes:
+        comment (str):
+        result (FeedbackResultType):
     """
 
     comment: str = ""
