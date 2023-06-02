@@ -2,10 +2,12 @@ from enum import Enum
 
 
 class ClientEnv(str, Enum):
-    """Describe the environment in which a `Document` will be sent:
+    """
+    Describe the environment in which a `Document`_ is sent to.
 
-    - PROD: production environment
-    - TEST: test environment
+    Attributes:
+        PROD: Production environment.
+        TEST: Test environment.
     """
 
     PROD = "prod"
@@ -16,11 +18,16 @@ class ClientEnv(str, Enum):
 
 
 class ActionCode(str, Enum):
-    """Describe what kind of processing step is applied to a `Document`:
+    """
+    Processing step applied to a `Document`_.
 
-    - PROJECTION: generate a representation (update document or projection field)
-    - PREDICTION: update prediction
-    - REPERCUSSION: apply an action externally
+    Attributes:
+        PROJECTION: The document is read and interpreted, its content is saved in the database.
+        PREDICTION: The document has been treated and the prediction is available.
+        REPERCUSSION: An (external) action has been triggered.
+
+    Todo:
+        Change PROJECTION to READING.
     """
 
     PROJECTION = "projection"
@@ -32,13 +39,14 @@ class ActionCode(str, Enum):
 
 
 class DocumentStatus(str, Enum):
-    """Describe the status of a `Document` processing step:
+    """Status of a `Document`_.
 
-    - HOLD: Process has been interrupted by the plateform or developer
-    - WAITING: Some information is missing before process can start
-    - PROCESSING: A step is being processing
-    - SUCCESS: Step needs to be the last and log be `LogStatus.SUCCESS`
-    - ERROR: An error was encountered
+    Attributes:
+        HOLD: Process has been interrupted by the platform or developer.
+        WAITING: Some information is missing before the process can start.
+        PROCESSING: A step is being processed.
+        SUCCESS: The step has been correctly applied.
+        ERROR: An error has occurred.
     """
 
     HOLD = "101"
@@ -52,10 +60,11 @@ class DocumentStatus(str, Enum):
 
 
 class FeedbackVote(str, Enum):
-    """Describe the value of a `Label` as:
+    """Vote choices in a `LabelFeedback`_.
 
-    - VALID:
-    - INVALID:
+    Attributes:
+        VALID: The prediction has been validated.
+        INVALID: The prediction has been invalidated.
     """
 
     VALID = "Valid"
@@ -66,13 +75,14 @@ class FeedbackVote(str, Enum):
 
 
 class Url(str, Enum):
-    """URLs used for requests:
+    """URLs used for requests.
 
-    - LOGIN: Connection to LetXBe. Returns an acces token.
-    - POST_DOCUMENT: Post a document. Returns the document slug.
-    - POST_ARTEFACT: Post an artefact. Returns the dpcument slug.
-    - POST_PREDICTION: Post a prediction on a given document slug.
-    - GET_DOCUMENT: Request a document associated on a given document slug.
+    Attributes:
+        LOGIN: Connection to LetXBe. Returns an acces token.
+        POST_DOCUMENT: Post a document. Returns the document slug.
+        POST_ARTEFACT: Post an artefact. Returns the document slug.
+        POST_PREDICTION: Post a prediction on a given document slug.
+        GET_DOCUMENT: Request a document associated on a given document slug.
     """
 
     LOGIN = "/api/get_m2m_token"
@@ -88,6 +98,22 @@ class Url(str, Enum):
 
 
 class ServiceUrl(str, Enum):
+    """
+    Attributes:
+        TASK:
+        SAVE:
+        FINISH:
+        TARGET:
+        TARGET_RESOURCE:
+        TARGET_PROJECTION:
+        ARTEFACT:
+        ARTEFACT_RESOURCE:
+        ARTEFACT_PROJECTION:
+
+    Todo:
+        Add documentation
+    """
+
     TASKS = "/api/service/{service:s}/task"
     SAVE = "/api/service/{service:s}/task/{task:s}/save"
     FINISH = "/api/service/{service:s}/task/{task:s}/finish"

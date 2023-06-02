@@ -9,7 +9,21 @@ BASE_URL = "https://prod-unfold.onogone.com"
 
 
 class LXBSession:
-    """Connection session to LetXbe and share requests."""
+    """Base class for connection with the server.
+
+    Alongside the server address, two informations provided by Auth0 are required to establish
+    a successful connection:
+
+        - the client identifier, referred to as ``client_id``;
+        - the client password, referred to as ``client_secret``.
+
+    When instanciated, an access token is requested to the server. If the request is accepted,
+    the token (also called ``BEARER_CODE``) is returned and stored. This token will populate
+    the authentication header that will allow authentication while posting or getting data
+    to/from the server.
+
+    Please note that this token is temporary: it will expire after a while.
+    """
 
     def __init__(
         self, client_id: str, client_secret: str, server_address: Optional[str] = None

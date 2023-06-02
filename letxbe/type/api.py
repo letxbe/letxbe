@@ -4,12 +4,10 @@ from pydantic import BaseModel
 
 
 class FeedbackResponse(BaseModel):
-    """Response returned when posting a `Feedback` on a document.
+    """Response returned when posting a `Feedback`_ on a document.
 
-    See :obj:`letxbe.type.labels.FeedBack` for more information.
-
-        Attributes:
-            updated_labels (List[str]): List of labels whose value have been updated.
+    Attributes:
+        updated_labels (List[str]): Labels whose values have received a feedback.
     """
 
     updated_labels: List[str]

@@ -1,6 +1,8 @@
 Known Issues
 ============
 
+List of known issues
+--------------------
 
 Queue not respecting order
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -38,7 +40,7 @@ Files exceeding 100MB cannot be posted for the moment due to Tornado
 limitations. We are working to support larger files.
 
 Report an issue
-===============
+---------------
 
 Use github default issue tracker or contact us via email at
 team@letxbe.ai.

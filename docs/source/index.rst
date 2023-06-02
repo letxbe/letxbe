@@ -18,12 +18,13 @@ Welcome to letxbe's documentation!
    :target: https://opensource.org/licenses/MIT
 .. |circle ci shield| image:: https://img.shields.io/circleci/build/bitbucket/onogone/letxbe?token=00601288e2fce2f6e8f35da8bcc0e154342f8eed
 
-Connect and control `LetXbe services <http://letxbe.ai/>`__ via a python
-API.
+Connect and control `LetXbe <http://letxbe.ai/>`__ API services.
 
-**letxbe** package contains an API wrapper to connect to `LetXbe
-API <http://letxbe.ai/>`__ and the necessary types to handle input and
-output data.
+``letxbe`` is the Python SDK of LetXbe API. Notably, it contains:
+
+   - :ref:`LXB <lxb>`: main class to connect and control LetXBe services.
+   - Provider (under construction, for developers)
+   - :ref:`Type <type>`: the typing for all objects used in the API.
 
 
 .. toctree::
@@ -49,11 +50,3 @@ output data.
    Installation Guide <developers.installation>
    Todo <developers.todo>
    Release Notes <developers.release_notes>
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

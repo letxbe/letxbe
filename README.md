@@ -183,14 +183,7 @@ Use github default issue tracker or contact us via email at
 [team@letxbe.ai](mailto:team@letxbe.ai).
 
 # TODO
-* add examples of artefact and target in return
-* add documentation on artefact/target key-value pairs
-* add documentation of values for `status_code`
-* Generate documentation for type sub-package
-* Add better handling of HTTP status when there's an error
-* explicit error for files greater than 100MB
-* Use python badge shields based on classifiers in setup, see
-  https://shields.io/category/platform-support
+* add sphinx documentation website
 
 # License
 

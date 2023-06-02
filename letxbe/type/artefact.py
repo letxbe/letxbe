@@ -12,24 +12,25 @@ from .document import DocumentMixin, StatusMixin, WithParentMixin
 
 
 class ArtefactMixin(BaseModel):
-    """Information specific to an `Artefact`.
+    """Information specific to an `Artefact`_.
 
     Attributes:
-        role (str): Should identify what the artefact is used for.
+        role (str): Uniquely identify the artefact as document connected to another
+        document. It is chosen during set-up.
     """
 
     role: str = Field(..., min_length=1)
 
 
 class ArtefactToConnect(SlugMixin):
-    """Information that is enough to connect an `Artefact` to other documents when uploading them.
-    Essentially a `SlugMixin` referencing an `Document` of specific type `Artefact`."""
+    """Information that is enough to connect an artefact to other documents when uploading them.
+    Essentially a `SlugMixin`_ referencing an `Document`_ of specific type `Artefact`_."""
 
 
 class WithArtefactsMixin(BaseModel):
     """Capacity to connect a document to a series of artefacts when uploading it.
 
-    Keys in `WithArtefactsMixin.artefact` are defined in the `Automatisme` configuration.
+    Keys in ``WithArtefactsMixin.artefact`` are defined in the `Automatisme` configuration.
 
     Attributes:
         artefact (Dict[str, ArtefactToConnect]):
@@ -39,14 +40,14 @@ class WithArtefactsMixin(BaseModel):
 
 
 class ConnectedArtefact(DocumentMixin, ArtefactMixin, WithParentMixin, StatusMixin):
-    """Information about an `Artefact` that is available when accessing another `Document`
-    the `Artefact` is connected to."""
+    """Information about an `Artefact`_ that is available when accessing another `Document`_
+    the artefact is connected to."""
 
 
 class ArtefactConnectionMixin(BaseModel):
-    """Capacity for a document to provide information about connected `Artefact` documents.
+    """Capacity for a document to provide information about connected `Artefact`_ documents.
 
-    Keys in `ArtefactConnectionMixin.artefact` are defined in the `Automatisme` configuration.
+    Keys in ``ArtefactConnectionMixin.artefact`` are defined in the `Automatisme` configuration.
 
     Attributes:
         artefact (Dict[str, ConnectedArtefact]):
@@ -61,4 +62,4 @@ class ArtefactConnectionMixin(BaseModel):
 class Artefact(
     DocumentMixin, ArtefactMixin, WithParentMixin, StatusMixin, ArtefactConnectionMixin
 ):
-    """Information about an `Artefact` that is available when accessing it directly."""
+    """Document sent to letxbe to be connected to one or multiple `Target`_."""

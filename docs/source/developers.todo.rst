@@ -10,5 +10,6 @@ Todo
 *  Use python badge shields based on classifiers in setup, see
    `<https://shields.io/category/platform-support>`__
 *  Inherit doctring (e.g. :obj:`letxbe.provider.main.Provider`) 
+*  Improve inter references in docstring
 
 See issues adressed to users on page `known issues <first_steps.known_issues.html>`__.

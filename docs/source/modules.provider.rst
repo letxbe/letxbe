@@ -1,6 +1,8 @@
 letxbe.provider package
 =======================
 
+*DOCUMENTATION IN PROGRESS*
+
 Subpackages
 -----------
 

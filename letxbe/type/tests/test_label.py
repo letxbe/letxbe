@@ -2,9 +2,17 @@ import pytest
 from pydantic import ValidationError
 
 from letxbe.type.label import (
+    BBoxInPageClue,
+    Current,
     CurrentResultType,
+    Feedback,
     FeedbackResultType,
+    Label,
+    LabelFeedback,
+    LabelPrediction,
+    Prediction,
     PredictionResultType,
+    WordClue,
 )
 from letxbe.utils import pydantic_model_to_json
 
@@ -176,3 +184,46 @@ def test_prediction_result_type__table(result_type):
     # When
     with pytest.raises(ValidationError):
         _ = result_type(__root__=result)
+
+
+def test_bbox_in_page_clue(bbox_in_page_clue_dict):
+    assert bbox_in_page_clue_dict == BBoxInPageClue(**bbox_in_page_clue_dict).dict()
+
+
+def test_word_clue(word_clue_dict):
+    assert word_clue_dict == WordClue(**word_clue_dict).dict()
+
+
+def test_label_prediction(prenom_label_prediction_dict, date_label_prediction_dict):
+    assert (
+        prenom_label_prediction_dict
+        == LabelPrediction(**prenom_label_prediction_dict).dict()
+    )
+    assert (
+        date_label_prediction_dict
+        == LabelPrediction(**date_label_prediction_dict).dict()
+    )
+
+
+def test_prediction(prediction_dict):
+    assert prediction_dict == Prediction(**prediction_dict).dict()
+
+
+def test_label_feedback(prenom_label_feedback_dict, date_label_feedback_dict):
+    assert (
+        prenom_label_feedback_dict == LabelFeedback(**prenom_label_feedback_dict).dict()
+    )
+    assert date_label_feedback_dict == LabelFeedback(**date_label_feedback_dict).dict()
+
+
+def test_feedback(feedback_dict):
+    assert feedback_dict == Feedback(**feedback_dict).dict()
+
+
+def test_label(prenom_label_dict, date_label_dict):
+    assert prenom_label_dict == Label(**prenom_label_dict).dict()
+    assert date_label_dict == Label(**date_label_dict).dict()
+
+
+def test_current(current_dict):
+    assert current_dict == Current(**current_dict).dict()

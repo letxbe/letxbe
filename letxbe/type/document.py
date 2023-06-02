@@ -6,68 +6,79 @@ from .base import CreatedMixin, SlugMixin, ValueType
 from .enum import ActionCode, ClientEnv, DocumentStatus
 
 FormValueType = Union[List[ValueType], ValueType]
+"""Types of values used in `FormResultType`_. See also `ValueType`_ for more information."""
 
 
 class FormResultType(BaseModel):
-    """Dict-like object with:
+    """
+    Define part of the metadata attached to a document.
 
-    - keys with string format
-    - values with `FormValueType` format
+    It is a nested dict containing key-value pairs, where the values can be:
+
+        - a primitive object, see `ValueType`_
+        - a list of primitive objects
+        - a nested dict of the same type of `FormResultType`
+
+    `FormResultType` is used in the `Form`_ class.
+
+    Example:
+
+        ::
+
+            {
+                "address": {                                # sub dict object
+                    "principal": True,                      # ValueType: bool
+                    "street": "41 rue Beauregard",          # ValueType: str
+                    "zip code": 75002,                      # ValueType: int
+                },
+                "artefacts": ["customers", "orders"],       # List[ValueType]
+            }
+
+    Attributes:
+        __root__:
     """
 
-    __root__: Dict[str, Optional[Union[FormValueType, "FormResultType"]]] = {}
+    __root__: Dict[str, Union[FormValueType, "FormResultType", None]] = {}
 
 
 FormResultType.update_forward_refs()
 
 
 class Form(BaseModel):
-    """Contains information available about a `Document` when uploading it.
+    """
+    See `FormResultType`_.
 
-    Args:
+    Attributes:
         result (FormResultType):
-
-    Remarks:
-      - Can be used in multiple scenarii:
-          - specifying options for an AI Model
-          - attaching an `Artefact` after uploading a `Target`,
-            in that case, `Target` is not processed until a matching artefact is found.
-      - In some cases, a file may not be attached to a `Document` as the `Form`
-        holds complete information about it.
     """
 
     result: FormResultType = FormResultType()
 
 
 class MetadataMixin(BaseModel):
-    """Information shared about a document when uploading it.
+    """
+    Metadata attached to a document during upload.
 
-    Args:
-        client_env (ClientEnv): Environment the document should be sent to (test, prod)
-
-        extension (str): Extension of the file, eg "xlsx", "pdf",... Should be "" when no file
-        is shared with the document.
-
-        name (str, optional): Name to give the document, if you want to override a file's name.
-
-              - This property should not end with an extension.
-              - This property can be edited after a `Prediction` or `Feedback` is made.
-
-        form (Form): A Form object containing information available about the document when uploading it.
+    Attributes:
+        client_env (ClientEnv): Environment the document should be sent to.
+        extension (str): Extension of the file, eg "xlsx", "pdf",... Should be "" when
+            no file is shared with the document.
+        form (Form): See `Form`_.
 
     Todo:
         Ensure name doesn't end with an extension when uploading a file,
         or weird behaviors will appear when trying to download it later.
+
+        Move extension to DocumentMixin
     """
 
     client_env: ClientEnv = ClientEnv.TEST
-    name: Optional[str] = None
     form: Form = Form()
     extension: str = ""
 
 
 class ParentDocument(BaseModel):
-    """Define a relationship with a parent `Document` (`Parent`).
+    """Define a relationship with a parent `Document`_ (`Parent`).
     Used when a `Child` document is an extract of a `Parent`.
 
     Attributes:
@@ -82,7 +93,7 @@ class ParentDocument(BaseModel):
 
         projection: a filter that lists `xid` values from Parent.projection[...] `ProjectionRoot` objects that should be kept in Child.projection
 
-          - keys are `pkey` or `ProjectionClue`
+          - keys are `pkey` or `ProjectionClue`_
           - If no `ProjectionRoot` objects should be transferred, use [] or do not cite `pkey` in `Parent.projection`
           - If all `ProjectionRoot` objects should be transferred, use None
     """
@@ -94,22 +105,22 @@ class ParentDocument(BaseModel):
 
 
 class WithParentMixin(BaseModel):
-    """Ability to be connected to a `ParentDocument`
+    """Ability to be connected to a `ParentDocument`_.
 
     Attributes:
-        parent (`ParentDocument` or None):
+        parent (ParentDocument or None):
     """
 
     parent: Optional[ParentDocument] = None
 
 
 class StatusMixin(BaseModel):
-    """Define codes that indicate `Document` processing status.
+    """Define codes that indicate `Document`_ processing status.
 
     Attributes:
-        status_code (DocumentStatus): Indicates pipeline processing status.
-        action_code (ActionCode or None): Characterizes the latest complete step.
-        exception (str or None): Corresponds to the latest exception met.
+        status_code (DocumentStatus): Current status in the processing pipeline.
+        action_code (ActionCode or None): Latest complete step.
+        exception (str or None): Latest exception met if any.
     """
 
     status_code: DocumentStatus = DocumentStatus.PROCESSING
@@ -118,11 +129,11 @@ class StatusMixin(BaseModel):
 
 
 class DocumentMixin(CreatedMixin, SlugMixin, MetadataMixin):
-    """Information generated about a `Document`.
+    """Information generated about a `Document`_.
 
     Attributes:
-        name (str): `Document` name.
-        urn (str): `Document` URN.
+        name (str): name given when uploading it.
+        urn (str): unique file identifier used internally.
     """
 
     name: str

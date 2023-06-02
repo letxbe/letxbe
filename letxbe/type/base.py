@@ -64,7 +64,7 @@ class CreatedMixin(BaseModel):
 
     Attributes:
         created_at (int): Timestamp in milliseconds corresponding to the creation of
-            the object. Set to 0 at default.
+            the object. Set to 0 by default.
     """
 
     created_at: int = 0
