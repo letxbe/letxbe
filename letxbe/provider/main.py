@@ -353,6 +353,8 @@ class Provider(LXBSession):
             headers=self.authorization_header,
         )
 
+        self._verify_status_code(res)
+
         zipped = bytes_to_zipfile(res.content)
         return zipfile_to_byte_files(zipped)
 
