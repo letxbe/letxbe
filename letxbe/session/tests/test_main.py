@@ -9,7 +9,6 @@ from letxbe.session import LXBSession
 
 @pytest.fixture(scope="session")
 def mock_lxbsession(mock_access_token) -> LXBSession:
-
     with patch(
         "letxbe.session.main.requests.post",
         return_value=Mock(

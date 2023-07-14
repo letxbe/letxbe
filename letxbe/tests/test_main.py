@@ -12,7 +12,6 @@ from letxbe.type.enum import Url
 
 @pytest.fixture
 def mock_lxb(mock_access_token):
-
     with patch(
         "letxbe.main.requests.post",
         return_value=Mock(

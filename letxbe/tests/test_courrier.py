@@ -19,7 +19,6 @@ with open(os.path.join(TEST_FILES_PATH, FILE_NAME), "rb") as file:
 
 
 def test_main(lxb):
-
     if not lxb:
         return
 

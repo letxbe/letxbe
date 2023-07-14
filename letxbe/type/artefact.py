@@ -24,7 +24,8 @@ class ArtefactMixin(BaseModel):
 
 class ArtefactToConnect(SlugMixin):
     """Information that is enough to connect an artefact to other documents when uploading them.
-    Essentially a `SlugMixin`_ referencing an `Document`_ of specific type `Artefact`_."""
+    Essentially a `SlugMixin`_ referencing an `Document`_ of specific type `Artefact`_.
+    """
 
 
 class WithArtefactsMixin(BaseModel):

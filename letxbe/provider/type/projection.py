@@ -87,7 +87,6 @@ class ProjectionRoot(ProjectionMap):
             projection_map_result: Dict[str, ProjectionMapValueType],
             projection_location: Optional[str],
         ) -> None:
-
             for key, projection in projection_map_result.items():
                 if isinstance(projection, list):
                     for index, element in enumerate(projection):

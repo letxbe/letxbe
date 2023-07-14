@@ -26,7 +26,6 @@ from letxbe.utils import pydantic_model_to_json
     ],
 )
 def test_result_type_recursive(result_type):
-
     if result_type == PredictionResultType:
         LABEL_BASE = {"score": None, "model_version": None}
     elif result_type == FeedbackResultType:
@@ -110,7 +109,6 @@ def test_result_type_recursive(result_type):
     ],
 )
 def test_prediction_result_type__table(result_type):
-
     if result_type == PredictionResultType:
         LABEL_BASE = {"score": None, "model_version": None}
     elif result_type == FeedbackResultType:

@@ -5,12 +5,12 @@ black
 isort
 flake8-black
 flake8-isort
-pydantic
+pydantic==1.*
 pytest
 types-requests
 requests
 python-dotenv
-pillow==9.3.0
+pillow
 types-Pillow
 sphinx
 sphinx-rtd-theme

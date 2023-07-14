@@ -14,7 +14,6 @@ def mock_provider_urn() -> str:
 
 @pytest.fixture(scope="session")
 def mock_provider(mock_access_token, mock_provider_urn) -> Provider:
-
     with patch(
         "letxbe.session.main.requests.post",
         return_value=Mock(
