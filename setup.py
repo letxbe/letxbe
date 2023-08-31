@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 requires = [
     "requests",
-    "pydantic",
+    "pydantic==1.*",
     "pillow",
     "setuptools==63.4.3",  # see https://github.com/python/mypy/issues/13392
 ]
