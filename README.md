@@ -1,14 +1,11 @@
 # letxbe
 [![pydantic](https://img.shields.io/badge/dependencies-pydantic-brightgreen)](https://pydantic-docs.helpmanual.io/)
-[![pydantic](https://img.shields.io/badge/dependencies-requests-brightgreen)](https://pypi.org/project/requests)
+[![requests](https://img.shields.io/badge/dependencies-requests-brightgreen)](https://pypi.org/project/requests)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Circle CI](https://img.shields.io/circleci/build/bitbucket/onogone/letxbe?token=00601288e2fce2f6e8f35da8bcc0e154342f8eed)
 
-Connect and control [LetXbe services](http://letxbe.ai/) via a python API.
+`letxbe` package is a python wrapper to connect to [LetXbe API](http://letxbe.ai/).
 
-**letxbe** package contains an API wrapper to connect to [LetXbe API](http://letxbe.ai/)
-and the necessary types to handle input and output data.
 
 ## Install
 
@@ -18,8 +15,6 @@ To install the package run `pip install git+https://github.com/letxbe/letxbe.git
 
 Developers should clone the repository via `git clone` and then install the developer
 requirements via `pip install -r requirements-dev.txt`.
-
-Include authentication parameters in `.env` file in order to run integration tests, including `CLIENT_ID` and `CLIENT_SECRET`.
 
 # Basic usage
 
@@ -173,8 +168,11 @@ We are working to make every error explicit and documented. For the moment, ther
 chances that you encounter not-documented and/or not-explicit errors.
 
 #### Too large files
-Files exceeding 100MB cannot be posted for the moment due to Tornado limitations.
-We are working to support larger files.
+We do not support
+* files larger than 150MB
+* PDFs with more than 120 pages
+
+* We are working to support larger files.
 
 
 ## Report an issue

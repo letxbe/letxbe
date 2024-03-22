@@ -3,6 +3,7 @@
 An `Artefact` is a `Document` that provides additional information when handling `Target` documents.
 
 """
+
 from typing import Dict
 
 from pydantic import BaseModel, Field

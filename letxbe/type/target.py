@@ -3,6 +3,7 @@
 A `Target` is a `Document` that can be processed to generate and store a `Prediction` or `Feedback`.
 
 """
+
 from typing import Literal, Optional, Union
 
 from pydantic import BaseModel
@@ -34,6 +35,9 @@ class Target(
     DocumentMixin, TargetMixin, WithParentMixin, StatusMixin, ArtefactConnectionMixin
 ):
     """Document sent to letxbe to get predictions."""
+
+    class Config:
+        use_enum_values = True
 
 
 Document = Union[Target, Artefact]

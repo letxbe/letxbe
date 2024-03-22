@@ -2,7 +2,6 @@ import pytest
 from pydantic import ValidationError
 
 from letxbe.type.label import (
-    BBoxInPageClue,
     Current,
     CurrentResultType,
     Feedback,
@@ -10,9 +9,9 @@ from letxbe.type.label import (
     Label,
     LabelFeedback,
     LabelPrediction,
+    LabelType,
     Prediction,
     PredictionResultType,
-    WordClue,
 )
 from letxbe.utils import pydantic_model_to_json
 
@@ -27,11 +26,11 @@ from letxbe.utils import pydantic_model_to_json
 )
 def test_result_type_recursive(result_type):
     if result_type == PredictionResultType:
-        LABEL_BASE = {"score": None, "model_version": None}
+        LABEL_BASE = {"score": None, "model_version": None, "label_type": "prediction"}
     elif result_type == FeedbackResultType:
-        LABEL_BASE = {"source": None, "vote": "Valid"}
+        LABEL_BASE = {"source": None, "vote": "Valid", "label_type": "feedback"}
     else:
-        LABEL_BASE = {}
+        LABEL_BASE = {"label_type": None}
 
     # Given
     result = {
@@ -110,11 +109,11 @@ def test_result_type_recursive(result_type):
 )
 def test_prediction_result_type__table(result_type):
     if result_type == PredictionResultType:
-        LABEL_BASE = {"score": None, "model_version": None}
+        LABEL_BASE = {"score": None, "model_version": None, "label_type": "prediction"}
     elif result_type == FeedbackResultType:
-        LABEL_BASE = {"source": None, "vote": "Valid"}
+        LABEL_BASE = {"source": None, "vote": "Valid", "label_type": "feedback"}
     else:
-        LABEL_BASE = {}
+        LABEL_BASE = {"label_type": None}
 
     # Given
     result = {
@@ -184,14 +183,6 @@ def test_prediction_result_type__table(result_type):
         _ = result_type(__root__=result)
 
 
-def test_bbox_in_page_clue(bbox_in_page_clue_dict):
-    assert bbox_in_page_clue_dict == BBoxInPageClue(**bbox_in_page_clue_dict).dict()
-
-
-def test_word_clue(word_clue_dict):
-    assert word_clue_dict == WordClue(**word_clue_dict).dict()
-
-
 def test_label_prediction(prenom_label_prediction_dict, date_label_prediction_dict):
     assert (
         prenom_label_prediction_dict
@@ -225,3 +216,43 @@ def test_label(prenom_label_dict, date_label_dict):
 
 def test_current(current_dict):
     assert current_dict == Current(**current_dict).dict()
+
+
+def test_prediction__has_no_enum_values():
+    # Given
+    lp_dict = {
+        "label_type": LabelType.PREDICTION,
+        "lid": "wum41149ux68",
+        "score": 0.85,
+    }
+    label_prediction = LabelPrediction(**lp_dict)
+    prediction = Prediction(**{"result": {"some_label": label_prediction}})
+
+    # Then
+    print(label_prediction.dict())
+    print(prediction.dict())
+    assert label_prediction.dict() == {
+        "label_type": "prediction",
+        "lid": "wum41149ux68",
+        "value": None,
+        "clues": [],
+        "children": None,
+        "score": 0.85,
+        "model_version": None,
+    }
+    assert prediction.dict() == {
+        "model_version": None,
+        "score": None,
+        "comment": "",
+        "result": {
+            "some_label": {
+                "label_type": "prediction",
+                "lid": "wum41149ux68",
+                "value": None,
+                "clues": [],
+                "children": None,
+                "score": 0.85,
+                "model_version": None,
+            }
+        },
+    }
