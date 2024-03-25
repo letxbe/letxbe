@@ -1,5 +1,12 @@
 import pytest
 
+from letxbe.type.page import BBox
+
+
+@pytest.fixture
+def bbox__with_zeros() -> BBox:
+    return BBox(x0=0, x1=0, y0=0, y1=0)
+
 
 @pytest.fixture
 def form_dict():
@@ -57,6 +64,7 @@ def prenom_label_prediction_dict(word_clue_dict):
         "score": 100.0,
         "model_version": None,
         "children": None,
+        "label_type": "prediction",
     }
 
 
@@ -69,6 +77,7 @@ def date_label_prediction_dict(bbox_in_page_clue_dict):
         "score": None,
         "model_version": None,
         "children": None,
+        "label_type": "prediction",
     }
 
 
@@ -86,6 +95,7 @@ def prediction_result_dict(prenom_label_prediction_dict, date_label_prediction_d
                     "children": None,
                     "score": 98.1,
                     "model_version": None,
+                    "label_type": "prediction",
                 },
                 "client_2": {
                     "lid": "2fe3133e-2745-4b66-82db-c0dd612e5f69",
@@ -94,6 +104,7 @@ def prediction_result_dict(prenom_label_prediction_dict, date_label_prediction_d
                     "children": None,
                     "score": 98.2,
                     "model_version": None,
+                    "label_type": "prediction",
                 },
             },
         ],
@@ -106,6 +117,7 @@ def prediction_result_dict(prenom_label_prediction_dict, date_label_prediction_d
                     "children": None,
                     "score": 98.3,
                     "model_version": None,
+                    "label_type": "prediction",
                 },
             },
         },
@@ -131,6 +143,7 @@ def prenom_label_feedback_dict():
         "children": None,
         "source": None,
         "vote": "Valid",
+        "label_type": "feedback",
     }
 
 
@@ -143,6 +156,7 @@ def date_label_feedback_dict():
         "children": None,
         "source": None,
         "vote": "Invalid",
+        "label_type": "feedback",
     }
 
 
@@ -159,6 +173,7 @@ def feedback_result_dict(prenom_label_feedback_dict, date_label_feedback_dict):
                 "children": None,
                 "source": None,
                 "vote": "Invalid",
+                "label_type": "feedback",
             }
         ],
         "externe": {
@@ -170,6 +185,7 @@ def feedback_result_dict(prenom_label_feedback_dict, date_label_feedback_dict):
                     "children": None,
                     "source": None,
                     "vote": "Valid",
+                    "label_type": "feedback",
                 }
             }
         },
@@ -191,6 +207,7 @@ def prenom_label_dict():
         "value": "Exemplaire",
         "clues": [],
         "children": None,
+        "label_type": None,
     }
 
 
@@ -201,6 +218,7 @@ def date_label_dict():
         "value": "1651363299999",
         "clues": [],
         "children": None,
+        "label_type": None,
     }
 
 
@@ -216,12 +234,14 @@ def current_result_dict(prenom_label_dict, date_label_dict):
                     "value": "QWE000",
                     "clues": [],
                     "children": None,
+                    "label_type": None,
                 },
                 "client_2": {
                     "lid": "2fe3133e-2745-4b66-82db-gggg612e5f69",
                     "value": "QWE125",
                     "clues": [],
                     "children": None,
+                    "label_type": None,
                 },
             }
         ],
@@ -231,6 +251,7 @@ def current_result_dict(prenom_label_dict, date_label_dict):
                 "value": "F4567",
                 "clues": [],
                 "children": None,
+                "label_type": None,
             }
         },
     }

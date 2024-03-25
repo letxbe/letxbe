@@ -3,7 +3,13 @@ from typing import Dict, Optional, Tuple, Union
 
 import requests
 
-from letxbe.session import LXBSession
+from letxbe.exception import (
+    AutomationError,
+    ForbiddenError,
+    UnauthorizedError,
+    UnknownResourceError,
+)
+from letxbe.session import BASE_URL, create_letxbe_session
 from letxbe.type import (
     Artefact,
     Feedback,
@@ -16,9 +22,59 @@ from letxbe.type.enum import Url
 from letxbe.utils import pydantic_model_to_json
 
 
-class LXB(LXBSession):
+class LXB:
     """Connection session to LetXbe. Provides methods for posting or
     requesting documents, artefacts, predictions and feedbacks."""
+
+    def __init__(
+        self, client_id: str, client_secret: str, server_address: Optional[str] = None
+    ):
+        """
+        Args:
+            client_id (str): Auth0 client ID.
+            client_secret (str): Auth0 client secret.
+            server_address (str, optional): Address of the server.
+                If None or not specified, `BASE_URL` will be used by default.
+        """
+        self.__server_address = BASE_URL if server_address is None else server_address
+        self.__session = create_letxbe_session(
+            client_id, client_secret, self.__server_address
+        )
+
+    @property
+    def server(self) -> str:
+        """Address of the server."""
+        return self.__server_address
+
+    @staticmethod
+    def _verify_status_code(res: requests.Response) -> None:
+        """Map the response status code to a Python exception and raise it (if any).
+
+        Args:
+            res (requests.Response): Response of a request.
+
+        Raises:
+            ForbiddenError: connection to the server is forbidden (403 Forbidden).
+            UnknownResourceError: the requested resource is not found (404 Not Found).
+            AutomationError: the server is facing an internal error (500 Internal Server Error).
+            ValueError: if the server returns any other error code.
+        """
+        if res.status_code == 401:
+            raise UnauthorizedError(f"401 in response: {res}")
+
+        if res.status_code == 403:
+            raise ForbiddenError(f"403 in response: {res}")
+
+        if res.status_code == 404:
+            raise UnknownResourceError(f"404 in response: {res}")
+
+        if res.status_code == 500:
+            raise AutomationError(f"500 in response: {res}")
+
+        if res.status_code == 200:
+            return
+
+        raise ValueError(f"Request failed with code {res.status_code}: {res}")
 
     def _post_document(
         self,
@@ -47,13 +103,12 @@ class LXB(LXBSession):
         if slug is not None:
             metadata_dict["slug"] = slug
 
-        response = requests.post(
+        response = self.__session.post(
             url=route,
             files=files,
             data={
                 "metadata": json.dumps(metadata_dict),
             },
-            headers=self.authorization_header,
         )
 
         self._verify_status_code(response)
@@ -126,13 +181,12 @@ class LXB(LXBSession):
             document_slug (str): Slug of the document.
             prediction (Prediction): Contents of the prediction.
         """
-        response = requests.post(
+        response = self.__session.post(
             url=self.server
             + Url.POST_PREDICTION.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
             data=json.dumps(prediction.dict()),
-            headers=self.authorization_header,
         )
 
         self._verify_status_code(response)
@@ -155,13 +209,12 @@ class LXB(LXBSession):
         Returns:
             FeedbackResponse: The response containing the updated labels.
         """
-        response = requests.post(
+        response = self.__session.post(
             url=self.server
             + Url.POST_FEEDBACK.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
             data=json.dumps(feedback.dict()),
-            headers=self.authorization_header,
         )
 
         self._verify_status_code(response)
@@ -184,12 +237,11 @@ class LXB(LXBSession):
             the document slug.
         """
 
-        response = requests.get(
+        response = self.__session.get(
             url=self.server
             + Url.GET_DOCUMENT.format(
                 automatisme_slug=automatisme_slug, document_slug=document_slug
             ),
-            headers=self.authorization_header,
         )
 
         self._verify_status_code(response)

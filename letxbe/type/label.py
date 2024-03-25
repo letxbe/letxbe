@@ -1,106 +1,18 @@
-import uuid
-from typing import Dict, List, Optional, Union
+from enum import Enum
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 
+from letxbe.type.clue import ClueType
+from letxbe.utils import generate_short_unique_id
+
 from .base import ValueType
 from .enum import FeedbackVote
-from .image import BBox
-
-FEEDBACK_M2M_IDENTIFIER = "M2M"
 
 
-class ClueMixin(BaseModel):
-    """
-    Define shared information between all clue formats.
-
-    Attributes:
-        role (str or None):  Role of (or reference to) the document that contains the
-            source or the clue. If the clue comes from its attached document, then
-            the value must be `None`. Else the value must be a reference to the
-            artefact containing the clue (see artefacts keys in ``ArtefactConnectionMixin``).
-        value (str): Clue value.
-    """
-
-    value: str = ""
-    role: Optional[str]
-
-
-class BBoxMixin(BaseModel):
-    """
-    Normalized coordinates of a bounding box in an image.
-
-    Attributes:
-        bbox (BBox): Bounding box (see type.image.BBox).
-    """
-
-    bbox: BBox
-
-
-class PageClue(ClueMixin):
-    """
-    Point to a page in a document.
-
-    Attributes:
-        page_idx (int): Page index of a page in an original document.
-
-    Remarks:
-        If a document is a split version of an original one, `page_idx` is the
-        page index of the page in the original document.
-    """
-
-    page_idx: int
-
-
-class WordClue(PageClue):
-    """
-    Coordinates of a word in a ``Page`` object.
-
-    Attributes:
-        line_idx (int): Line index.
-        word_idx (int): Word index.
-        bbox (BBox or None): Normalized coordinates of a bounding box in an image.
-            See type.image.BBox.
-    """
-
-    line_idx: int
-    word_idx: int
-    bbox: Optional[BBox] = None
-
-
-class BBoxInPageClue(PageClue, BBoxMixin):
-    """
-    Point to a bounding box in a page of a document.
-    """
-
-
-class ProjectionClue(ClueMixin):
-    """
-    Contains information to extract a `ProjectionField` from a Document.
-
-    Attributes:
-        pkey (str): Key pointing to a list of `ProjectionRoot`
-        xid (str): xid of the ProjectionRoot
-        projection_entry (str): See `__ProjectionBase.projection_entry`
-            # TODO rename this to `projection_path`
-
-    Examples:
-      - (without recursive structure) document.projection[pkey]
-          - filter projection_root_list by `xid`
-          - output projection_root.result[projection_entry]
-      - (with recursive structure) # TODO add example
-    """
-
-    pkey: str
-    xid: str
-    projection_entry: str
-    token_idx: Optional[int] = 0
-    length: Optional[int] = 0
-
-
-ClueType = Union[ProjectionClue, WordClue, BBoxInPageClue, PageClue]
-"""Types of clues used in labels. See ``ProjectionClue``, ``BBoxInPageClue``,
-``WordClue``, ``PageClue`` and ``Label`` for mor information."""
+class LabelType(str, Enum):
+    PREDICTION = "prediction"
+    FEEDBACK = "feedback"
 
 
 class ChildConnection(BaseModel):
@@ -116,17 +28,19 @@ class ChildConnection(BaseModel):
 
 class Label(BaseModel):
     """
-    Information produced about a `Target` and its connected `Artefact` documents.
+    Define an information produced about a target and its artefacts, stored in a Feedback or Prediction.
 
-    Attributes:
-        lid (str): Unique identifier for the label.
-        value (ValueType or None): Value of label. There can be only one Label with
-            the same `value` in a `multiple prediction field`.
-        clues (List[ClueType]): List of clues to explain `value`.
-        children: (List[ChildConnection] or None):
+    Args:
+        lid: a unique identifier for the Label, among a document's labels
+        value: Information on the label.
+          There can be only one Label with the same `value` in a `multiple prediction field`
+        clues: List of ClueType objects to explain `value`
+        children (Optional[str]): points to documents resulting of a split of the
+            original document.
     """
 
-    lid: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    label_type: Optional[LabelType] = None
+    lid: str = Field(default_factory=generate_short_unique_id)
     value: Optional[ValueType]
     clues: List[ClueType] = []
     children: Optional[List[ChildConnection]] = None
@@ -152,24 +66,30 @@ class LabelFeedback(Label):
           in ``Target.current``.
     """
 
-    source: Optional[str] = FEEDBACK_M2M_IDENTIFIER
+    label_type: Literal[LabelType.FEEDBACK] = LabelType.FEEDBACK
+    source: Optional[str] = None  # TODO define possible values as enum, e.g., "M2M"
     vote: FeedbackVote = FeedbackVote.VALID
+
+    class Config:
+        use_enum_values = True
 
 
 class LabelPrediction(Label):
-    """
-    Minimal data structure used in ``Prediction``, containing a single prediction.
+    """Minimal data structure used in ``Prediction``, containing a single prediction.
+
     ``Prediction.result[key]`` is either a ``LabelPrediction`` or a list of ones.
 
     Attributes:
         score (float, None): score of the prediction between 0 and 100
         model_version (str, None): version of the model used for the prediction
-        children (Optional[str]): points to documents resulting of a split of the
-            original document.
     """
 
+    label_type: Literal[LabelType.PREDICTION] = LabelType.PREDICTION
     score: Optional[float] = Field(None, ge=0, le=100)
     model_version: Optional[str] = None
+
+    class Config:
+        use_enum_values = True
 
 
 CurrentValueType = Union[List[Label], Label]

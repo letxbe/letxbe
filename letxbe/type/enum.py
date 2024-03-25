@@ -13,9 +13,6 @@ class ClientEnv(str, Enum):
     PROD = "prod"
     TEST = "test"
 
-    class Config:
-        use_enum_values = True
-
 
 class ActionCode(str, Enum):
     """
@@ -33,9 +30,6 @@ class ActionCode(str, Enum):
     PROJECTION = "projection"
     PREDICTION = "prediction"
     REPERCUSSION = "repercussion"
-
-    class Config:
-        use_enum_values = True
 
 
 class DocumentStatus(str, Enum):
@@ -55,9 +49,6 @@ class DocumentStatus(str, Enum):
     SUCCESS = "200"
     ERROR = "500"
 
-    class Config:
-        use_enum_values = True
-
 
 class FeedbackVote(str, Enum):
     """Vote choices in a `LabelFeedback`_.
@@ -69,9 +60,6 @@ class FeedbackVote(str, Enum):
 
     VALID = "Valid"
     INVALID = "Invalid"
-
-    class Config:
-        use_enum_values = True
 
 
 class Url(str, Enum):
